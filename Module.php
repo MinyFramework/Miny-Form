@@ -26,7 +26,9 @@
 
 namespace Modules\Form;
 
-use \Miny\Application\Application;
+use Miny\Application\Application;
+use Modules\Form\Elements\Button;
+use Modules\Form\Elements\Image;
 
 class Module extends \Miny\Application\Module
 {
@@ -36,6 +38,35 @@ class Module extends \Miny\Application\Module
         if (!is_null($token)) {
             $fv->addMethodCall('setCSRFToken', $token);
         }
+        $session = $app->session;
+
+        $app->getDescriptor('view')->addMethodCall('addMethod', 'button',
+                function($url, $method, array $params = array()) use($session) {
+
+                    if (isset($params['form'])) {
+                        $form_params = $params['form'];
+                        unset($params['form']);
+                    } else {
+                        $form_params = array();
+                    }
+                    $form_params['action'] = $url;
+                    $form_params['method'] = $method;
+                    $descriptor = new FormDescriptor;
+
+                    $descriptor->token = $session['token'];
+
+                    if (isset($params['src'])) {
+                        $descriptor->addField(new Image('button', $params['src'], $params));
+                    } else {
+                        $value = isset($params['value']) ? $params['value'] : NULL;
+                        $descriptor->addField(new Button('button', $value, $params));
+                    }
+                    $form = new FormBuilder($descriptor);
+                    $output = $form->begin($form_params);
+                    $output .= $form->render('button');
+                    $output.= $form->end();
+                    return $output;
+                });
     }
 
 }
