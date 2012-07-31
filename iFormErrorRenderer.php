@@ -21,12 +21,12 @@
  * @copyright 2012 Dániel Buga <daniel@bugadani.hu>
  * @license   http://www.gnu.org/licenses/gpl.txt
  *            GNU General Public License
- * @version   1.0
+ * @version   1.0-dev
  */
 
 namespace Modules\Form;
 
-use \Miny\Validator\ConstraintViolationList;
+use Miny\Validator\ConstraintViolationList;
 
 interface iFormErrorRenderer
 {

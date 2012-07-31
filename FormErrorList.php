@@ -21,14 +21,17 @@
  * @copyright 2012 Dániel Buga <daniel@bugadani.hu>
  * @license   http://www.gnu.org/licenses/gpl.txt
  *            GNU General Public License
- * @version   1.0
+ * @version   1.0-dev
  */
 
 namespace Modules\Form;
 
-use \Miny\Validator\ConstraintViolationList;
+use ArrayIterator;
+use IteratorAggregate;
+use Miny\Validator\ConstraintViolationList;
+use UnexpectedValueException;
 
-class FormErrorList implements \IteratorAggregate
+class FormErrorList implements IteratorAggregate
 {
     private $errors = array();
 
@@ -37,8 +40,7 @@ class FormErrorList implements \IteratorAggregate
         foreach ($errors as $field => $list) {
 
             if (!$list instanceof ConstraintViolationList) {
-                $message = 'Array values must be ConstraintViolationList';
-                throw new \UnexpectedValueException($message);
+                throw new UnexpectedValueException('Array values must be instances of ConstraintViolationList');
             }
 
             if (!isset($this->errors[$field])) {
@@ -63,7 +65,7 @@ class FormErrorList implements \IteratorAggregate
 
     public function getIterator()
     {
-        return new \ArrayIterator($this->errors);
+        return new ArrayIterator($this->errors);
     }
 
     public function getList()

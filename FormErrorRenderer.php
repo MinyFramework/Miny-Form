@@ -21,12 +21,12 @@
  * @copyright 2012 Dániel Buga <daniel@bugadani.hu>
  * @license   http://www.gnu.org/licenses/gpl.txt
  *            GNU General Public License
- * @version   1.0
+ * @version   1.0-dev
  */
 
 namespace Modules\Form;
 
-use \Miny\Validator\ConstraintViolationList;
+use Miny\Validator\ConstraintViolationList;
 
 class FormErrorRenderer implements iFormErrorRenderer
 {
@@ -40,8 +40,7 @@ class FormErrorRenderer implements iFormErrorRenderer
         return $string;
     }
 
-    public function render(FormElement $element, array $element_options,
-                           ConstraintViolationList $errors)
+    public function render(FormElement $element, array $element_options, ConstraintViolationList $errors)
     {
         $string = $element->render($element_options);
         $string .= $this->renderFieldErrors($errors);
@@ -62,7 +61,8 @@ class FormErrorRenderer implements iFormErrorRenderer
             $string .= $this->renderFieldErrors($list);
             $string .= '</li>';
         }
-        return $string . '</ul>';
+        $string .= '</ul>';
+        return $string;
     }
 
 }

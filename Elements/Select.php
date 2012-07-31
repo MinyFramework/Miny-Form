@@ -21,12 +21,12 @@
  * @copyright 2012 Dániel Buga <daniel@bugadani.hu>
  * @license   http://www.gnu.org/licenses/gpl.txt
  *            GNU General Public License
- * @version   1.0
+ * @version   1.0-dev
  */
 
 namespace Modules\Form\Elements;
 
-use \Modules\Form\FormElement;
+use Modules\Form\FormElement;
 
 class Select extends FormElement
 {
@@ -54,7 +54,7 @@ class Select extends FormElement
     {
         $options = '';
         $data = $this->value;
-        if(is_null($data) && $this->multiple) {
+        if (is_null($data) && $this->multiple) {
             $data = array();
         }
         foreach ($this->choices as $key => $text) {

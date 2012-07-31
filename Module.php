@@ -21,7 +21,7 @@
  * @copyright 2012 Dániel Buga <daniel@bugadani.hu>
  * @license   http://www.gnu.org/licenses/gpl.txt
  *            GNU General Public License
- * @version   1.0
+ * @version   1.0-dev
  */
 
 namespace Modules\Form;
@@ -38,10 +38,9 @@ class Module extends \Miny\Application\Module
         if (!is_null($token)) {
             $fv->addMethodCall('setCSRFToken', $token);
         }
-        $session = $app->session;
 
         $app->getDescriptor('view')->addMethodCall('addMethod', 'button',
-                function($url, $method, array $params = array()) use($session) {
+                function($url, $method, array $params = array()) use($token) {
 
                     if (isset($params['form'])) {
                         $form_params = $params['form'];
@@ -51,9 +50,9 @@ class Module extends \Miny\Application\Module
                     }
                     $form_params['action'] = $url;
                     $form_params['method'] = $method;
-                    $descriptor = new FormDescriptor;
 
-                    $descriptor->token = $session['token'];
+                    $descriptor = new FormDescriptor;
+                    $descriptor->token = $token;
 
                     if (isset($params['src'])) {
                         $descriptor->addField(new Image('button', $params['src'], $params));
@@ -64,7 +63,7 @@ class Module extends \Miny\Application\Module
                     $form = new FormBuilder($descriptor);
                     $output = $form->begin($form_params);
                     $output .= $form->render('button');
-                    $output.= $form->end();
+                    $output .= $form->end();
                     return $output;
                 });
     }

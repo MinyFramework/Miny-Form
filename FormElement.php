@@ -21,12 +21,12 @@
  * @copyright 2012 Dániel Buga <daniel@bugadani.hu>
  * @license   http://www.gnu.org/licenses/gpl.txt
  *            GNU General Public License
- * @version   1.0
+ * @version   1.0-dev
  */
 
 namespace Modules\Form;
 
-use Exceptions\FormElementExeption;
+use OutOfBoundsException;
 
 abstract class FormElement
 {
@@ -40,9 +40,9 @@ abstract class FormElement
             $this->value = $options['value'];
             unset($options['value']);
         }
-        $this->label = $label;
+        $options['name'] = $name;
         $this->options = $options;
-        $this->options['name'] = $name;
+        $this->label = $label;
     }
 
     public function __set($key, $value)
@@ -60,7 +60,7 @@ abstract class FormElement
             return $this->$key;
         }
         if (!isset($this->options[$key])) {
-            throw new \OutOfBoundsException('Option not set: ' . $key);
+            throw new OutOfBoundsException('Option not set: ' . $key);
         }
         return $this->options[$key];
     }

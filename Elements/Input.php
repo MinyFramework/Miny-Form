@@ -21,15 +21,23 @@
  * @copyright 2012 Dániel Buga <daniel@bugadani.hu>
  * @license   http://www.gnu.org/licenses/gpl.txt
  *            GNU General Public License
- * @version   1.0
+ * @version   1.0-dev
  */
 
 namespace Modules\Form\Elements;
 
-use \Modules\Form\FormElement;
+use Modules\Form\FormElement;
 
 class Input extends FormElement
 {
+    public function __construct($name, $label, $options = array(), $type = NULL)
+    {
+        if ($type) {
+            $options['type'] = $type;
+        }
+        parent::__construct($name, $label, $options);
+    }
+
     public function render(array $options = array())
     {
         $options = $options + $this->options;

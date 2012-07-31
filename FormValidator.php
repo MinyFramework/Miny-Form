@@ -21,15 +21,16 @@
  * @copyright 2012 Dániel Buga <daniel@bugadani.hu>
  * @license   http://www.gnu.org/licenses/gpl.txt
  *            GNU General Public License
- * @version   1.0
+ * @version   1.0-dev
  */
 
 namespace Modules\Form;
 
-use \Miny\Validator\Constraints\Equals;
-use \Miny\Validator\Descriptor;
-use \Miny\Validator\Validator;
-use \Miny\Validator\iValidable;
+use BadMethodCallException;
+use Miny\Validator\Constraints\Equals;
+use Miny\Validator\Descriptor;
+use Miny\Validator\iValidable;
+use Miny\Validator\Validator;
 
 class FormValidator extends Validator
 {
@@ -47,7 +48,7 @@ class FormValidator extends Validator
 
         if ($form->getOption('csrf')) {
             if (is_null($this->token)) {
-                throw new \BadMethodCallException('CSRF token not set.');
+                throw new BadMethodCallException('CSRF token not set.');
             }
             $class->addPropertyConstraint('token', new Equals($this->token));
         }

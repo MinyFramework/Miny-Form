@@ -21,13 +21,17 @@
  * @copyright 2012 Dániel Buga <daniel@bugadani.hu>
  * @license   http://www.gnu.org/licenses/gpl.txt
  *            GNU General Public License
- * @version   1.0
+ * @version   1.0-dev
  */
 
 namespace Modules\Form;
 
-use \Miny\Validator\iValidable;
-use \Miny\Validator\Descriptor;
+use ArrayAccess;
+use InvalidArgumentException;
+use Miny\Validator\Descriptor;
+use Miny\Validator\iValidable;
+use OutOfBoundsException;
+use Traversable;
 
 class FormDescriptor implements iValidable
 {
@@ -42,8 +46,8 @@ class FormDescriptor implements iValidable
     public function __construct($data = array())
     {
         if(!is_array($data)) {
-            if(!($data instanceof \ArrayAccess && $data instanceof \Traversable)) {
-                throw new \InvalidArgumentException('Data should be an array or array-like object.');
+            if(!($data instanceof ArrayAccess && $data instanceof Traversable)) {
+                throw new InvalidArgumentException('Data should be an array or array-like object.');
             }
         }
 
@@ -69,7 +73,7 @@ class FormDescriptor implements iValidable
     public function getOption($key)
     {
         if (!isset($this->options[$key])) {
-            throw new \OutOfBoundsException('Option not set: ' . $key);
+            throw new OutOfBoundsException('Option not set: ' . $key);
         }
         return $this->options[$key];
     }
@@ -97,7 +101,7 @@ class FormDescriptor implements iValidable
     public function getField($key)
     {
         if (!isset($this->fields[$key])) {
-            throw new \OutOfBoundsException('Field not set: ' . $key);
+            throw new OutOfBoundsException('Field not set: ' . $key);
         }
         return $this->fields[$key];
     }
