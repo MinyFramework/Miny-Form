@@ -27,10 +27,10 @@
 namespace Modules\Form;
 
 use BadMethodCallException;
-use Miny\Validator\Constraints\Equals;
-use Miny\Validator\Descriptor;
-use Miny\Validator\iValidable;
-use Miny\Validator\Validator;
+use Modules\Validator\Constraints\Equals;
+use Modules\Validator\Descriptor;
+use Modules\Validator\iValidable;
+use Modules\Validator\Validator;
 
 class FormValidator extends Validator
 {

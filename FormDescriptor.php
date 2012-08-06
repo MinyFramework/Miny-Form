@@ -28,8 +28,8 @@ namespace Modules\Form;
 
 use ArrayAccess;
 use InvalidArgumentException;
-use Miny\Validator\Descriptor;
-use Miny\Validator\iValidable;
+use Modules\Validator\Descriptor;
+use Modules\Validator\iValidable;
 use OutOfBoundsException;
 use Traversable;
 

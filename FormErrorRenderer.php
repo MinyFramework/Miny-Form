@@ -26,7 +26,7 @@
 
 namespace Modules\Form;
 
-use Miny\Validator\ConstraintViolationList;
+use Modules\Validator\ConstraintViolationList;
 
 class FormErrorRenderer implements iFormErrorRenderer
 {

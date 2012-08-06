@@ -28,7 +28,7 @@ namespace Modules\Form;
 
 use ArrayIterator;
 use IteratorAggregate;
-use Miny\Validator\ConstraintViolationList;
+use Modules\Validator\ConstraintViolationList;
 use UnexpectedValueException;
 
 class FormErrorList implements IteratorAggregate

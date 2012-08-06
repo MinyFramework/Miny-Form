@@ -32,6 +32,11 @@ use Modules\Form\Elements\Image;
 
 class Module extends \Miny\Application\Module
 {
+    public function getDependencies()
+    {
+        return array('Validator');
+    }
+
     public function init(Application $app, $token = NULL)
     {
         $fv = $app->add('form_validator', __NAMESPACE__ . '\FormValidator');
@@ -39,7 +44,7 @@ class Module extends \Miny\Application\Module
             $fv->addMethodCall('setCSRFToken', $token);
         }
 
-        $app->getDescriptor('view')->addMethodCall('addMethod', 'button',
+        $app->getBlueprint('view')->addMethodCall('addMethod', 'button',
                 function($url, $method, array $params = array()) use($token) {
 
                     if (isset($params['form'])) {
