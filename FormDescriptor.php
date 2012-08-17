@@ -74,6 +74,11 @@ class FormDescriptor implements iValidable
         return $this->fields;
     }
 
+    public function toArray()
+    {
+        return array_intersect_key(get_object_vars($this), $this->fields);
+    }
+
     public function addField(FormElement $field)
     {
         $this->fields[$field->name] = $field;
