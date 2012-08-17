@@ -14,6 +14,5 @@ use Modules\Validator\ConstraintViolationList;
 interface iFormErrorRenderer
 {
     public function renderList(FormDescriptor $form);
-    public function render(FormElement $element, array $element_options,
-                           ConstraintViolationList $errors);
+    public function render(FormElement $element, array $element_options, ConstraintViolationList $errors);
 }
