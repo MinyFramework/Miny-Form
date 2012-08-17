@@ -9,7 +9,6 @@
 
 namespace Modules\Form;
 
-use BadMethodCallException;
 use Modules\Validator\Constraints\Equals;
 use Modules\Validator\Descriptor;
 use Modules\Validator\iValidable;
@@ -29,10 +28,7 @@ class FormValidator extends Validator
         $class = new Descriptor;
         $form->getValidationInfo($class);
 
-        if ($form->getOption('csrf')) {
-            if (is_null($this->token)) {
-                throw new BadMethodCallException('CSRF token not set.');
-            }
+        if ($form->getOption('csrf') && !is_null($this->token)) {
             $class->addPropertyConstraint('token', new Equals($this->token));
         }
 
