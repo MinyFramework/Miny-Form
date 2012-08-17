@@ -24,7 +24,7 @@ class FormDescriptor implements iValidable
         'method' => 'POST'
     );
     public $token;
-    private $errors;
+    protected $errors;
 
     public function __construct($data = array())
     {
