@@ -56,9 +56,11 @@ class FormBuilder
             $form .= $this->render($key);
         }
         if ($reset) {
-            $form .= $this->reset();
+            $reset_label = isset($options['reset']) ? $options['reset'] : NULL;
+            $form .= $this->reset($reset_label);
         }
-        $form .= $this->submit();
+        $submit_label = isset($options['submit']) ? $options['submit'] : NULL;
+        $form .= $this->submit($submit_label);
         $form .= $this->end();
         return $form;
     }
