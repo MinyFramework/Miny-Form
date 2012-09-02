@@ -27,7 +27,7 @@ class Module extends \Miny\Application\Module
             $fv->addMethodCall('setCSRFToken', $token);
         }
 
-        $app->getBlueprint('view')->addMethodCall('addMethod', 'button',
+        $app->getBlueprint('view_factory')->addMethodCall('addMethod', 'button',
                 function($url, $method, array $params = array()) use($app, $token) {
 
                     if (isset($params['form'])) {
