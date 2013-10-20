@@ -9,7 +9,7 @@
 
 namespace Modules\Form\Elements;
 
-class DateTime extends Input
+class Time extends Input
 {
     public function __construct($name, $label, $options = array())
     {
