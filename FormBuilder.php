@@ -12,23 +12,66 @@ namespace Modules\Form;
 use Modules\Form\Elements\Hidden;
 use Modules\Form\Elements\Reset;
 use Modules\Form\Elements\Submit;
+use Modules\Translation\Translation;
 
 class FormBuilder
 {
+    /**
+     * @var FormDescriptor
+     */
     private $descriptor;
+
+    /**
+     * @var iFormErrorRenderer
+     */
     private $error_renderer;
+
+    /**
+     * @var bool
+     */
     private $errors_rendered = false;
 
-    public function __construct(FormDescriptor $form = NULL, iFormErrorRenderer $renderer = NULL)
+    /**
+     * @var Translation
+     */
+    private $translation;
+
+    /**
+     * @param FormDescriptor $form
+     * @param iFormErrorRenderer $renderer
+     * @param Translation $translation
+     */
+    public function __construct(FormDescriptor $form = NULL, iFormErrorRenderer $renderer = NULL,
+                                Translation $translation = NULL)
     {
         if (is_null($form)) {
             $form = new FormDescriptor;
         }
         if (is_null($renderer)) {
-            $renderer = new FormErrorRenderer;
+            $renderer = new FormErrorRenderer($translation);
         }
         $this->descriptor = $form;
         $this->error_renderer = $renderer;
+        $this->translation = $translation;
+
+        if ($translation !== NULL) {
+            $translatable_fields = array('placeholder', 'label');
+            foreach ($form->getFields() as $element) {
+                foreach ($translatable_fields as $field) {
+                    if (isset($element->$field)) {
+                        $element->$field = $this->translate($element->$field);
+                    }
+                }
+            }
+        }
+    }
+
+    protected function translate($string)
+    {
+        if (isset($this->translation)) {
+            return $this->translation->get($string);
+        }
+        return $string;
     }
 
     public function addField(FormElement $field)
@@ -77,14 +120,20 @@ class FormBuilder
 
     public function submit($label = NULL, $id = 'submit', array $options = array())
     {
+        if (!is_null($label)) {
+            $label = $this->translate($label);
+        }
         $submit = new Submit($id, $label);
         return $submit->render($options);
     }
 
     public function reset($label = NULL, $id = 'reset', array $options = array())
     {
-        $submit = new Reset($id, $label);
-        return $submit->render($options);
+        if (!is_null($label)) {
+            $label = $this->translate($label);
+        }
+        $reset = new Reset($id, $label);
+        return $reset->render($options);
     }
 
     public function begin(array $options = array())

@@ -32,6 +32,11 @@ abstract class FormElement
         }
     }
 
+    public function __isset($key)
+    {
+        return in_array($key, array('label', 'value')) || isset($this->options[$key]);
+    }
+
     public function __set($key, $value)
     {
         if (in_array($key, array('label', 'value'))) {

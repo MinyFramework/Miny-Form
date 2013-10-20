@@ -9,15 +9,34 @@
 
 namespace Modules\Form;
 
+use Modules\Translation\Translation;
 use Modules\Validator\ConstraintViolationList;
 
 class FormErrorRenderer implements iFormErrorRenderer
 {
+    /**
+     * @var Translation
+     */
+    private $translation;
+
+    public function __construct(Translation $translation = NULL)
+    {
+        $this->translation = $translation;
+    }
+
+    protected function translate($string)
+    {
+        if (isset($this->translation)) {
+            return $this->translation->get($string);
+        }
+        return $string;
+    }
+
     private function renderFieldErrors(ConstraintViolationList $list)
     {
         $string = '<ul class="field_errors">';
         foreach ($list as $error) {
-            $string .= sprintf('<li>%s</li>', (string) $error);
+            $string .= sprintf('<li>%s</li>', $this->translate((string) $error));
         }
         $string .= '</ul>';
         return $string;
