@@ -26,12 +26,16 @@ abstract class FormElement
         $options['name'] = $name;
         $this->options = $options;
         $this->label = $label;
+
+        if (!isset($this->options['id'])) {
+            $this->options['id'] = $this->options['name'];
+        }
     }
 
     public function __set($key, $value)
     {
-        if ($key == 'value') {
-            $this->value = $value;
+        if (in_array($key, array('label', 'value'))) {
+            $this->$key = $value;
         } else {
             $this->options[$key] = $value;
         }
@@ -66,10 +70,6 @@ abstract class FormElement
     {
         if (is_null($this->label)) {
             return NULL;
-        }
-
-        if (!isset($this->options['id'])) {
-            $this->options['id'] = $this->options['name'];
         }
 
         $options['for'] = $this->options['id'];
