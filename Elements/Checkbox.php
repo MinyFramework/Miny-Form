@@ -16,4 +16,13 @@ class Checkbox extends Input
         parent::__construct($name, $label, $options, 'checkbox');
     }
 
+    public function render(array $options = array())
+    {
+        if ($this->hasValue()) {
+            $options['checked'] = 'checked';
+            $this->value = null;
+        }
+        return parent::render($options);
+    }
+
 }
