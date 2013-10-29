@@ -9,7 +9,7 @@
 
 namespace Modules\Form;
 
-use Miny\Application\Application;
+use Miny\Application\BaseApplication;
 use Modules\Form\Elements\Image;
 use Modules\Form\Elements\Submit;
 
@@ -20,7 +20,7 @@ class Module extends \Miny\Application\Module
         return array('Validator');
     }
 
-    public function init(Application $app, $token = NULL)
+    public function init(BaseApplication $app, $token = NULL)
     {
         $fv = $app->add('form_validator', __NAMESPACE__ . '\FormValidator');
         if (!is_null($token)) {
