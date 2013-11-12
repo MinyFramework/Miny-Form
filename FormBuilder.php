@@ -79,6 +79,14 @@ class FormBuilder
         $this->descriptor->addField($field);
     }
 
+    /**
+     * @return FormElement[]
+     */
+    public function getFields()
+    {
+        return $this->descriptor->getFields();
+    }
+
     public function getHTMLArgList(array $args)
     {
         $arglist = '';
