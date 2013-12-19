@@ -51,8 +51,7 @@ class FormExtension extends Extension
 
         $descriptor = new FormDescriptor;
         if (isset($app['form:csrf_token'])) {
-            $token             = $app['form']['csrf_token'];
-            $descriptor->token = $app->getValue($token);
+            $descriptor->token = $app['form']['csrf_token'];
         }
         if (isset($params['src'])) {
             $descriptor->addField(new Image('button', $params['src'], $params));
