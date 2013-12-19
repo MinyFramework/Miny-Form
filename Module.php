@@ -10,11 +10,10 @@
 namespace Modules\Form;
 
 use Miny\Application\BaseApplication;
-use Modules\Form\Elements\Image;
-use Modules\Form\Elements\Submit;
 
 class Module extends \Miny\Application\Module
 {
+
     public function getDependencies()
     {
         return array('Validator');
@@ -24,34 +23,15 @@ class Module extends \Miny\Application\Module
     {
         $fv = $app->add('form_validator', __NAMESPACE__ . '\FormValidator');
         if (!is_null($token)) {
+            $app['form:csrf_token'] = $token;
             $fv->addMethodCall('setCSRFToken', $token);
         }
-        $button = function($url, $method, array $params = array()) use($app, $token) {
-            if (isset($params['form'])) {
-                $form_params = $params['form'];
-                unset($params['form']);
-            } else {
-                $form_params = array();
-            }
-            $form_params['action'] = $url;
-            $form_params['method'] = $method;
 
-            $descriptor = new FormDescriptor;
-            $descriptor->token = $app->getValue($token);
-
-            if (isset($params['src'])) {
-                $descriptor->addField(new Image('button', $params['src'], $params));
-            } else {
-                $value = isset($params['value']) ? $params['value'] : NULL;
-                $descriptor->addField(new Submit('button', $value, $params));
-            }
-            $form = new FormBuilder($descriptor);
-            $output = $form->begin($form_params);
-            $output .= $form->render('button');
-            $output .= $form->end();
-            return $output;
-        };
-        $app->getBlueprint('view_helpers')->addMethodCall('addMethod', 'button', $button);
+        $this->ifModule('Templating', function() use($app) {
+            $app->add('form_extensions', __NAMESPACE__ . '\\FormExtension')
+                    ->setArguments('&app');
+            $app->getBlueprint('template_environment')
+                    ->addMethodCall('addExtension', '&form_extensions');
+        });
     }
-
 }
