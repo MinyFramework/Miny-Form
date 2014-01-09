@@ -19,13 +19,18 @@ class Module extends \Miny\Application\Module
         return array('Validator');
     }
 
-    public function init(BaseApplication $app, $token = NULL)
+    public function init(BaseApplication $app)
     {
         $fv = $app->add('form_validator', __NAMESPACE__ . '\FormValidator');
-        if (!is_null($token)) {
-            $app['form:csrf_token'] = $token;
-            $fv->addMethodCall('setCSRFToken', $token);
-        }
+
+        $app->events->register('before_run', function() use ($app, $fv) {
+            $session = $app->session;
+            if (!isset($session['token'])) {
+                $session['token'] = sha1(mt_rand());
+            }
+            $app['form:csrf_token'] = $session['token'];
+            $fv->addMethodCall('setCSRFToken', $session['token']);
+        });
 
         $this->ifModule('Templating', function() use($app) {
             $app->add('form_extensions', __NAMESPACE__ . '\\FormExtension')
