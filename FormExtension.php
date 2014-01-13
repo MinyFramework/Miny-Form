@@ -33,7 +33,7 @@ class FormExtension extends Extension
     public function getFunctions()
     {
         return array(
-            new MethodFunction('button', 'buttonFunction', true),
+            new MethodFunction('button', 'buttonFunction', array('is_safe' => true)),
         );
     }
 
