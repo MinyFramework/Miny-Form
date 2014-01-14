@@ -21,21 +21,24 @@ class Module extends \Miny\Modules\Module
 
     public function init(BaseApplication $app)
     {
-        $fv = $app->add('form_validator', __NAMESPACE__ . '\FormValidator');
+        $factory    = $app->getFactory();
+        $parameters = $factory->getParameters();
 
-        $app->events->register('before_run', function() use ($app, $fv) {
-            $session = $app->session;
+        $fv = $factory->add('form_validator', __NAMESPACE__ . '\FormValidator');
+
+        $factory->events->register('before_run', function() use ($factory, $parameters, $fv) {
+            $session = $factory->session;
             if (!isset($session['token'])) {
                 $session['token'] = sha1(mt_rand());
             }
-            $app['form:csrf_token'] = $session['token'];
+            $parameters['form:csrf_token'] = $session['token'];
             $fv->addMethodCall('setCSRFToken', $session['token']);
         });
 
-        $this->ifModule('Templating', function() use($app) {
-            $app->add('form_extensions', __NAMESPACE__ . '\\FormExtension')
+        $this->ifModule('Templating', function() use($factory) {
+            $factory->add('form_extensions', __NAMESPACE__ . '\\FormExtension')
                     ->setArguments('&app');
-            $app->getBlueprint('template_environment')
+            $factory->getBlueprint('template_environment')
                     ->addMethodCall('addExtension', '&form_extensions');
         });
     }
