@@ -39,7 +39,7 @@ class FormExtension extends Extension
 
     public function buttonFunction($url, $method, array $params = array())
     {
-        $app = $this->application;
+        $config = $this->application->getFactory()->getParameters();
         if (isset($params['form'])) {
             $form_params = $params['form'];
             unset($params['form']);
@@ -50,8 +50,8 @@ class FormExtension extends Extension
         $form_params['method'] = $method;
 
         $descriptor = new FormDescriptor;
-        if (isset($app['form:csrf_token'])) {
-            $descriptor->token = $app['form']['csrf_token'];
+        if (isset($config['form:csrf_token'])) {
+            $descriptor->token = $config['form']['csrf_token'];
         }
         if (isset($params['src'])) {
             $descriptor->addField(new Image('button', $params['src'], $params));
