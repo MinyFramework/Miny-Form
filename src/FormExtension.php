@@ -10,6 +10,7 @@
 namespace Modules\Form;
 
 use Miny\Application\BaseApplication;
+use Miny\Factory\ParameterContainer;
 use Modules\Form\Elements\Image;
 use Modules\Form\Elements\Submit;
 use Modules\Templating\Compiler\Functions\MethodFunction;
@@ -17,12 +18,15 @@ use Modules\Templating\Extension;
 
 class FormExtension extends Extension
 {
-    private $application;
+    /**
+     * @var Container
+     */
+    private $parameterContainer;
 
-    public function __construct(BaseApplication $app)
+    public function __construct(ParameterContainer $parameterContainer)
     {
         parent::__construct();
-        $this->application = $app;
+        $this->parameterContainer = $parameterContainer;
     }
 
     public function getExtensionName()
@@ -39,7 +43,7 @@ class FormExtension extends Extension
 
     public function buttonFunction($url, $method, array $params = array())
     {
-        $config = $this->application->getFactory()->getParameters();
+        $config = $this->parameterContainer;
         if (isset($params['form'])) {
             $form_params = $params['form'];
             unset($params['form']);
