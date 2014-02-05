@@ -10,6 +10,8 @@
 namespace Modules\Form;
 
 use Miny\Application\BaseApplication;
+use Miny\Factory\Container;
+use Modules\Templating\Environment;
 
 class Module extends \Miny\Modules\Module
 {
@@ -21,25 +23,34 @@ class Module extends \Miny\Modules\Module
 
     public function init(BaseApplication $app)
     {
-        $factory    = $app->getFactory();
-        $parameters = $factory->getParameters();
+        $container  = $app->getContainer();
+        $parameters = $app->getParameterContainer();
 
-        $fv = $factory->add('form_validator', __NAMESPACE__ . '\FormValidator');
-
-        $factory->events->register('before_run', function() use ($factory, $parameters, $fv) {
-            $session = $factory->session;
-            if (!isset($session['token'])) {
-                $session['token'] = sha1(mt_rand());
+        $container->addCallback(
+            __NAMESPACE__ . '\\FormValidator',
+            function (FormValidator $fv, Container $container) use ($parameters) {
+                $session = $container->get('\\Miny\\HTTP\\Session');
+                if (!isset($session['token'])) {
+                    $session['token'] = sha1(mt_rand());
+                }
+                $parameters['form:csrf_token'] = $session['token'];
+                $fv->setCSRFToken($session['token']);
             }
-            $parameters['form:csrf_token'] = $session['token'];
-            $fv->addMethodCall('setCSRFToken', $session['token']);
-        });
+        );
 
-        $this->ifModule('Templating', function() use($factory) {
-            $factory->add('form_extensions', __NAMESPACE__ . '\\FormExtension')
-                    ->setArguments('&app');
-            $factory->getBlueprint('template_environment')
-                    ->addMethodCall('addExtension', '&form_extensions');
-        });
+        $this->ifModule(
+            'Templating',
+            function () use ($container) {
+                $container->addCallback(
+                    '\\Modules\\Templating\\Environment',
+                    function (Environment $environment, Container $container) {
+                        /** @var $extension FormExtension */
+                        $extension = $container->get(__NAMESPACE__ . '\\FormExtension');
+                        $environment->addExtension($extension);
+                    }
+                );
+
+            }
+        );
     }
 }

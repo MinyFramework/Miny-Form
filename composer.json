@@ -6,7 +6,9 @@
     "type": "library",
     "require": {
         "php": ">=5.3.3",
-        "miny/validator": "dev-master"
+        "miny/framework": "dev-master",
+        "miny/validator": "dev-master",
+        "miny/templating": "dev-master"
     },
     "authors": [
         {
