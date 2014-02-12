@@ -24,16 +24,16 @@ class Module extends \Miny\Modules\Module
     public function init(BaseApplication $app)
     {
         $container  = $app->getContainer();
-        $parameters = $app->getParameterContainer();
 
+        $module = $this;
         $container->addCallback(
             __NAMESPACE__ . '\\FormValidator',
-            function (FormValidator $fv, Container $container) use ($parameters) {
+            function (FormValidator $fv, Container $container) use ($module) {
                 $session = $container->get('\\Miny\\HTTP\\Session');
                 if (!isset($session['token'])) {
                     $session['token'] = sha1(mt_rand());
                 }
-                $parameters['form:csrf_token'] = $session['token'];
+                $module->setConfiguration('csrf_token', $session['token']);
                 $fv->setCSRFToken($session['token']);
             }
         );
@@ -49,7 +49,6 @@ class Module extends \Miny\Modules\Module
                         $environment->addExtension($extension);
                     }
                 );
-
             }
         );
     }
