@@ -41,7 +41,7 @@ class FormManager
         return $this->instantiateForm($class);
     }
 
-    public function validateForm($class, array $data)
+    public function getValidatedForm($class, array $data)
     {
         $class = $this->getFullyQualifiedName($class);
 
