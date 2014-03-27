@@ -31,6 +31,12 @@ class FormManager
         $this->formValidator = $validator;
     }
 
+    /**
+     * @param $class
+     * @param $name
+     *
+     * @return FormDescriptor
+     */
     public function createForm($class, $name)
     {
         $class = $this->getFullyQualifiedName($class);
@@ -41,6 +47,12 @@ class FormManager
         return $this->instantiateForm($class);
     }
 
+    /**
+     * @param string $class
+     * @param array  $data
+     *
+     * @return FormDescriptor
+     */
     public function getValidatedForm($class, array $data)
     {
         $class = $this->getFullyQualifiedName($class);
@@ -52,11 +64,22 @@ class FormManager
         return $form;
     }
 
+    /**
+     * @param $class
+     * @param $name
+     *
+     * @return FormBuilder
+     */
     public function createFormBuilder($class, $name)
     {
         return new FormBuilder($this->createForm($class, $name));
     }
 
+    /**
+     * @param FormDescriptor $form
+     * @param                $name
+     * @param int            $ttl The form is saved for this many requests.
+     */
     public function storeForm(FormDescriptor $form, $name, $ttl = 1)
     {
         $this->session->flash($name, $form, $ttl);
@@ -79,7 +102,7 @@ class FormManager
     /**
      * @param string $class
      *
-     * @param array $data
+     * @param array  $data
      *
      * @throws UnexpectedValueException
      * @return FormDescriptor
