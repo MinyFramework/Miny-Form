@@ -38,16 +38,16 @@ class FormManager
             return $this->session->$name;
         }
 
-        /** @var $form FormDescriptor */
-        $form = new $class;
+        return $this->instantiateForm($class);
+    }
 
-        if (!$form instanceof FormDescriptor) {
-            $pattern = 'Class %s is not an instance of FormDescriptor';
-            throw new UnexpectedValueException(sprintf($pattern, $class));
-        }
-        if ($form->getOption('csrf')) {
-            $form->token = $this->session['token'];
-        }
+    public function validateForm($class, array $data)
+    {
+        $class = $this->getFullyQualifiedName($class);
+
+        $form = $this->instantiateForm($class, $data);
+
+        $this->formValidator->validateForm($form);
 
         return $form;
     }
@@ -76,10 +76,16 @@ class FormManager
         throw new InvalidArgumentException('Class ' . $class . ' does not exist.');
     }
 
-    public function validateForm($class, array $data)
+    /**
+     * @param string $class
+     *
+     * @param array $data
+     *
+     * @throws UnexpectedValueException
+     * @return FormDescriptor
+     */
+    private function instantiateForm($class, array $data = array())
     {
-        $class = $this->getFullyQualifiedName($class);
-
         /** @var $form FormDescriptor */
         $form = new $class($data);
 
@@ -87,8 +93,11 @@ class FormManager
             $pattern = 'Class %s is not an instance of FormDescriptor';
             throw new UnexpectedValueException(sprintf($pattern, $class));
         }
+        if ($form->getOption('csrf')) {
+            $form->token = $this->session['token'];
 
-        $this->formValidator->validateForm($form);
+            return $form;
+        }
 
         return $form;
     }
