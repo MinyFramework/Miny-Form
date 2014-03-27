@@ -99,7 +99,7 @@ class FormDescriptor implements iValidable
 
     public function addErrors(array $errors)
     {
-        if (is_null($this->errors)) {
+        if (!isset($this->errors)) {
             $this->errors = new FormErrorList;
         }
         $this->errors->addList($errors);
@@ -112,7 +112,7 @@ class FormDescriptor implements iValidable
 
     public function hasErrors()
     {
-        return !is_null($this->errors);
+        return isset($this->errors);
     }
 
 }

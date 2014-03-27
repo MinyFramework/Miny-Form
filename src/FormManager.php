@@ -20,9 +20,15 @@ class FormManager
      */
     private $session;
 
-    public function __construct(Session $session)
+    /**
+     * @var FormValidator
+     */
+    private $formValidator;
+
+    public function __construct(Session $session, FormValidator $validator)
     {
-        $this->session = $session;
+        $this->session       = $session;
+        $this->formValidator = $validator;
     }
 
     public function createForm($class, $name)
@@ -68,5 +74,22 @@ class FormManager
         }
 
         throw new InvalidArgumentException('Class ' . $class . ' does not exist.');
+    }
+
+    public function validateForm($class, array $data)
+    {
+        $class = $this->getFullyQualifiedName($class);
+
+        /** @var $form FormDescriptor */
+        $form = new $class($data);
+
+        if (!$form instanceof FormDescriptor) {
+            $pattern = 'Class %s is not an instance of FormDescriptor';
+            throw new UnexpectedValueException(sprintf($pattern, $class));
+        }
+
+        $this->formValidator->validateForm($form);
+
+        return $form;
     }
 }
