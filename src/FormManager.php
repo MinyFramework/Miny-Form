@@ -95,8 +95,6 @@ class FormManager
         }
         if ($form->getOption('csrf')) {
             $form->token = $this->session['token'];
-
-            return $form;
         }
 
         return $form;
