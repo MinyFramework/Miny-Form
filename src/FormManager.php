@@ -46,6 +46,11 @@ class FormManager
         return $form;
     }
 
+    public function createFormBuilder($class, $name)
+    {
+        return new FormBuilder($this->createForm($class, $name));
+    }
+
     public function storeForm(FormDescriptor $form, $name, $ttl = 1)
     {
         $this->session->flash($name, $form, $ttl);
