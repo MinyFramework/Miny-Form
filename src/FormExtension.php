@@ -9,7 +9,6 @@
 
 namespace Modules\Form;
 
-use Miny\Application\BaseApplication;
 use Miny\Factory\ParameterContainer;
 use Modules\Form\Elements\Image;
 use Modules\Form\Elements\Submit;
@@ -19,7 +18,7 @@ use Modules\Templating\Extension;
 class FormExtension extends Extension
 {
     /**
-     * @var Container
+     * @var ParameterContainer
      */
     private $parameterContainer;
 
@@ -31,7 +30,7 @@ class FormExtension extends Extension
 
     public function getExtensionName()
     {
-        return 'min/form';
+        return 'miny/form';
     }
 
     public function getFunctions()
@@ -43,7 +42,6 @@ class FormExtension extends Extension
 
     public function buttonFunction($url, $method, array $params = array())
     {
-        $config = $this->parameterContainer;
         if (isset($params['form'])) {
             $form_params = $params['form'];
             unset($params['form']);
@@ -54,13 +52,13 @@ class FormExtension extends Extension
         $form_params['method'] = $method;
 
         $descriptor = new FormDescriptor;
-        if (isset($config['form:csrf_token'])) {
-            $descriptor->token = $config['form']['csrf_token'];
+        if (isset($this->parameterContainer['Form:csrf_token'])) {
+            $descriptor->token = $this->parameterContainer['Form']['csrf_token'];
         }
         if (isset($params['src'])) {
             $descriptor->addField(new Image('button', $params['src'], $params));
         } else {
-            $value = isset($params['value']) ? $params['value'] : NULL;
+            $value = isset($params['value']) ? $params['value'] : null;
             $descriptor->addField(new Submit('button', $value, $params));
         }
         $form   = new FormBuilder($descriptor);

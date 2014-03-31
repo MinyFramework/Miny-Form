@@ -28,14 +28,14 @@ class FormValidator extends Validator
         $class = new Descriptor;
         $form->getValidationInfo($class);
 
-        if ($form->getOption('csrf') && !is_null($this->token)) {
+        if ($form->getOption('csrf') && isset($this->token)) {
             $class->addPropertyConstraint('token', new Equals($this->token));
         }
 
         return $class;
     }
 
-    public function validateForm(FormDescriptor $form, $scenario = NULL)
+    public function validateForm(FormDescriptor $form, $scenario = null)
     {
         $result = parent::validate($form, $scenario);
         if ($result === true) {

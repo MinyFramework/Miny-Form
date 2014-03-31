@@ -24,8 +24,8 @@ abstract class FormElement
             unset($options['value']);
         }
         $options['name'] = $name;
-        $this->options = $options;
-        $this->label = $label;
+        $this->options   = $options;
+        $this->label     = $label;
 
         if (!isset($this->options['id'])) {
             $this->options['id'] = $this->options['name'];
@@ -54,6 +54,7 @@ abstract class FormElement
         if (!isset($this->options[$key])) {
             throw new OutOfBoundsException('Option not set: ' . $key);
         }
+
         return $this->options[$key];
     }
 
@@ -61,24 +62,26 @@ abstract class FormElement
     {
         $arglist = '';
         foreach ($args as $name => $value) {
-            $arglist .= sprintf(' %s="%s"', $name, $value);
+            $arglist .= ' ' . $name . '="' . $value . '"';
         }
+
         return $arglist;
     }
 
     public function hasValue()
     {
-        return !is_null($this->value);
+        return isset($this->value);
     }
 
     public function renderLabel(array $options = array())
     {
-        if (is_null($this->label)) {
-            return NULL;
+        if (!isset($this->label)) {
+            return null;
         }
 
         $options['for'] = $this->options['id'];
-        $options = $this->getHTMLArgList($options);
+        $options        = $this->getHTMLArgList($options);
+
         return sprintf('<label%s>%s</label>', $options, $this->label);
     }
 

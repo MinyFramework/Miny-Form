@@ -24,12 +24,12 @@ class FormBuilder
     /**
      * @var iFormErrorRenderer
      */
-    private $error_renderer;
+    private $errorRenderer;
 
     /**
      * @var bool
      */
-    private $errors_rendered = false;
+    private $errorsRendered = false;
 
     /**
      * @var Translation
@@ -37,30 +37,31 @@ class FormBuilder
     private $translation;
 
     /**
-     * @param FormDescriptor $form
+     * @param FormDescriptor     $form
      * @param iFormErrorRenderer $renderer
-     * @param Translation $translation
+     * @param Translation        $translation
      */
-    public function __construct(FormDescriptor $form = NULL, iFormErrorRenderer $renderer = NULL,
-                                Translation $translation = NULL)
-    {
-        if (is_null($form)) {
-            $form = new FormDescriptor;
-        }
-        if (is_null($renderer)) {
-            $renderer = new FormErrorRenderer($translation);
-        }
-        $this->descriptor = $form;
-        $this->error_renderer = $renderer;
-        $this->translation = $translation;
+    public function __construct(
+        FormDescriptor $form = null,
+        iFormErrorRenderer $renderer = null,
+        Translation $translation = null
+    ) {
 
-        if ($translation !== NULL) {
-            $translatable_fields = array('placeholder', 'label');
-            foreach ($form->getFields() as $element) {
-                foreach ($translatable_fields as $field) {
-                    if (isset($element->$field)) {
-                        $element->$field = $this->translate($element->$field);
-                    }
+        $form     = $form ? : new FormDescriptor;
+        $renderer = $renderer ? : new FormErrorRenderer($translation);
+
+        $this->descriptor    = $form;
+        $this->errorRenderer = $renderer;
+
+        if ($translation === null) {
+            return;
+        }
+        $this->translation   = $translation;
+        $translatable_fields = array('placeholder', 'label');
+        foreach ($form->getFields() as $element) {
+            foreach ($translatable_fields as $field) {
+                if (isset($element->$field)) {
+                    $element->$field = $this->translate($element->$field);
                 }
             }
         }
@@ -71,6 +72,7 @@ class FormBuilder
         if (isset($this->translation)) {
             return $this->translation->get($string);
         }
+
         return $string;
     }
 
@@ -91,8 +93,9 @@ class FormBuilder
     {
         $arglist = '';
         foreach ($args as $name => $value) {
-            $arglist .= sprintf(' %s="%s"', $name, $value);
+            $arglist .= ' ' . $name . '="' . $value . '"';
         }
+
         return $arglist;
     }
 
@@ -107,12 +110,13 @@ class FormBuilder
             $form .= $this->render($key);
         }
         if ($reset) {
-            $reset_label = isset($options['reset']) ? $options['reset'] : NULL;
+            $reset_label = isset($options['reset']) ? $options['reset'] : null;
             $form .= $this->reset($reset_label);
         }
-        $submit_label = isset($options['submit']) ? $options['submit'] : NULL;
+        $submit_label = isset($options['submit']) ? $options['submit'] : null;
         $form .= $this->submit($submit_label);
         $form .= $this->end();
+
         return $form;
     }
 
@@ -123,32 +127,38 @@ class FormBuilder
             $form .= $this->label($key);
             $form .= $this->render($key);
         }
+
         return $form;
     }
 
-    public function submit($label = NULL, $id = 'submit', array $options = array())
+    public function submit($label = null, $id = 'submit', array $options = array())
     {
-        if (!is_null($label)) {
+        if ($label !== null) {
             $label = $this->translate($label);
         }
         $submit = new Submit($id, $label);
+
         return $submit->render($options);
     }
 
-    public function reset($label = NULL, $id = 'reset', array $options = array())
+    public function reset($label = null, $id = 'reset', array $options = array())
     {
-        if (!is_null($label)) {
+        if ($label !== null) {
             $label = $this->translate($label);
         }
         $reset = new Reset($id, $label);
+
         return $reset->render($options);
     }
 
     public function begin(array $options = array())
     {
-        $method = isset($options['method']) ? $options['method'] : $this->descriptor->getOption('method');
+        $method = isset($options['method']) ? $options['method'] : $this->descriptor->getOption(
+            'method'
+        );
+
         $options['method'] = ($method == 'GET') ? 'GET' : 'POST';
-        $form = sprintf('<form%s>', $this->getHTMLArgList($options));
+        $form              = sprintf('<form%s>', $this->getHTMLArgList($options));
         if ($method != $options['method']) {
             $method_field = new Hidden('_method', array('value' => $method));
             $form .= $method_field->render();
@@ -157,12 +167,13 @@ class FormBuilder
         if ($this->descriptor->getOption('csrf') && $this->descriptor->token) {
             $token_field = new Hidden('token', array('value' => $this->descriptor->token));
             if ($this->descriptor->hasOption('name')) {
-                $form_name = $this->descriptor->getOption('name');
+                $form_name         = $this->descriptor->getOption('name');
                 $token_field->name = $form_name . '[token]';
             }
 
             $form .= $token_field->render();
         }
+
         return $form;
     }
 
@@ -173,8 +184,9 @@ class FormBuilder
 
     public function errors()
     {
-        $this->errors_rendered = true;
-        return $this->error_renderer->renderList($this->descriptor);
+        $this->errorsRendered = true;
+
+        return $this->errorRenderer->renderList($this->descriptor);
     }
 
     public function label($field, $options = array())
@@ -190,8 +202,8 @@ class FormBuilder
             $form_name = $this->descriptor->getOption('name');
 
             if (($pos = strpos($element->name, '[')) !== false) {
-                $name = substr($element->name, 0, $pos);
-                $extra = substr($element->name, $pos);
+                $name          = substr($element->name, 0, $pos);
+                $extra         = substr($element->name, $pos);
                 $element->name = $form_name . '[' . $name . ']' . $extra;
             } else {
                 $element->name = $form_name . '[' . $element->name . ']';
@@ -200,13 +212,15 @@ class FormBuilder
         if (isset($this->descriptor->$field)) {
             $element->value = $this->descriptor->$field;
         }
-        if ($this->descriptor->hasErrors() && !$this->errors_rendered) {
+        if ($this->descriptor->hasErrors() && !$this->errorsRendered) {
             $form_errors = $this->descriptor->getErrors();
             if ($form_errors->fieldHasErrors($field)) {
                 $errors = $form_errors->getFieldErrors($field);
-                return $this->error_renderer->render($element, $options, $errors);
+
+                return $this->errorRenderer->render($element, $options, $errors);
             }
         }
+
         return $element->render($options);
     }
 

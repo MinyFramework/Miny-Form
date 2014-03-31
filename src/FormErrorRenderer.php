@@ -19,7 +19,7 @@ class FormErrorRenderer implements iFormErrorRenderer
      */
     private $translation;
 
-    public function __construct(Translation $translation = NULL)
+    public function __construct(Translation $translation = null)
     {
         $this->translation = $translation;
     }
@@ -29,6 +29,7 @@ class FormErrorRenderer implements iFormErrorRenderer
         if (isset($this->translation)) {
             return $this->translation->get($string);
         }
+
         return $string;
     }
 
@@ -36,16 +37,18 @@ class FormErrorRenderer implements iFormErrorRenderer
     {
         $string = '<ul class="field_errors">';
         foreach ($list as $error) {
-            $string .= sprintf('<li>%s</li>', $this->translate((string) $error));
+            $string .= sprintf('<li>%s</li>', $this->translate((string)$error));
         }
         $string .= '</ul>';
+
         return $string;
     }
 
-    public function render(FormElement $element, array $element_options, ConstraintViolationList $errors)
+    public function render(FormElement $element, array $options, ConstraintViolationList $errors)
     {
-        $string = $element->render($element_options);
+        $string = $element->render($options);
         $string .= $this->renderFieldErrors($errors);
+
         return $string;
     }
 
@@ -64,6 +67,7 @@ class FormErrorRenderer implements iFormErrorRenderer
             $string .= '</li>';
         }
         $string .= '</ul>';
+
         return $string;
     }
 
