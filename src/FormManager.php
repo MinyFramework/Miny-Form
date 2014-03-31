@@ -32,19 +32,20 @@ class FormManager
     }
 
     /**
-     * @param $class
-     * @param $name
+     * @param       $class
+     * @param       $name
+     * @param array $data
      *
      * @return FormDescriptor
      */
-    public function createForm($class, $name)
+    public function createForm($class, $name, array $data = array())
     {
         $class = $this->getFullyQualifiedName($class);
         if (isset($this->session->$name) && $this->session->$name instanceof $class) {
             return $this->session->$name;
         }
 
-        return $this->instantiateForm($class);
+        return $this->instantiateForm($class, $data);
     }
 
     /**
@@ -65,14 +66,15 @@ class FormManager
     }
 
     /**
-     * @param $class
-     * @param $name
+     * @param       $class
+     * @param       $name
+     * @param array $data
      *
      * @return FormBuilder
      */
-    public function createFormBuilder($class, $name)
+    public function createFormBuilder($class, $name, array $data = array())
     {
-        return new FormBuilder($this->createForm($class, $name));
+        return new FormBuilder($this->createForm($class, $name, $data));
     }
 
     /**
