@@ -10,6 +10,9 @@
         "miny/validator": "dev-master",
         "miny/templating": "dev-master"
     },
+    "require-dev": {
+        "bugadani/minty": "dev-master"
+    },
     "authors": [
         {
             "name": "Dániel Buga",

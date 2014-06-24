@@ -9,11 +9,11 @@
 
 namespace Modules\Form;
 
+use Minty\Compiler\TemplateFunction;
 use Miny\Factory\ParameterContainer;
 use Modules\Form\Elements\Image;
 use Modules\Form\Elements\Submit;
-use Modules\Templating\Compiler\Functions\MethodFunction;
-use Modules\Templating\Extension;
+use Minty\Extension;
 
 class FormExtension extends Extension
 {
@@ -36,7 +36,7 @@ class FormExtension extends Extension
     public function getFunctions()
     {
         return array(
-            new MethodFunction('button', 'buttonFunction', array('is_safe' => true)),
+            new TemplateFunction('button', array($this, 'buttonFunction'), array('is_safe' => 'html')),
         );
     }
 
@@ -65,6 +65,7 @@ class FormExtension extends Extension
         $output = $form->begin($form_params);
         $output .= $form->render('button');
         $output .= $form->end();
+
         return $output;
     }
 }

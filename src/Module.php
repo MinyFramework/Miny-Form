@@ -9,9 +9,9 @@
 
 namespace Modules\Form;
 
+use Minty\Environment;
 use Miny\Application\BaseApplication;
 use Miny\Factory\Container;
-use Modules\Templating\Environment;
 
 class Module extends \Miny\Modules\Module
 {
@@ -42,7 +42,7 @@ class Module extends \Miny\Modules\Module
             'Templating',
             function () use ($container) {
                 $container->addCallback(
-                    '\\Modules\\Templating\\Environment',
+                    '\\Minty\\Environment',
                     function (Environment $environment, Container $container) {
                         /** @var $extension FormExtension */
                         $extension = $container->get(__NAMESPACE__ . '\\FormExtension');
