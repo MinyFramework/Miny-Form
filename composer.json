@@ -7,11 +7,11 @@
     "require": {
         "php": ">=5.3.3",
         "miny/framework": "dev-master",
-        "miny/validator": "dev-master",
-        "miny/templating": "dev-master"
+        "miny/validator": "dev-master"
     },
     "require-dev": {
-        "bugadani/minty": "dev-master"
+        "bugadani/minty": "dev-master",
+        "miny/templating": "dev-master"
     },
     "authors": [
         {

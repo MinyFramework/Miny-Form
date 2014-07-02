@@ -24,7 +24,6 @@ class FormExtension extends Extension
 
     public function __construct(ParameterContainer $parameterContainer)
     {
-        parent::__construct();
         $this->parameterContainer = $parameterContainer;
     }
 
