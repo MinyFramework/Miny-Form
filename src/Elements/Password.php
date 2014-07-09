@@ -2,19 +2,24 @@
 
 /**
  * This file is part of the Miny framework.
- * (c) Dániel Buga <daniel@bugadani.hu>
+ * (c) Dániel Buga <bugadani@gmail.com>
  *
  * For licensing information see the LICENSE file.
  */
 
 namespace Modules\Form\Elements;
 
-class Password extends Input
-{
-    public function __construct($name, $label, $options = array())
-    {
-        parent::__construct($name, $label, $options);
-        $this->type = 'password';
-    }
+use Modules\Form\AbstractFormElement;
 
+class Text extends AbstractFormElement
+{
+    protected function render(array $attributes)
+    {
+        $viewValue = $this->getViewValue();
+        if ($viewValue !== null) {
+            $attributes['value'] = $viewValue;
+        }
+
+        return sprintf('<input type="text"%s />', $this->attributes($attributes));
+    }
 }

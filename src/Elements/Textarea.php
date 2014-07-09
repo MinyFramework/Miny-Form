@@ -2,21 +2,24 @@
 
 /**
  * This file is part of the Miny framework.
- * (c) Dániel Buga <daniel@bugadani.hu>
+ * (c) Dániel Buga <bugadani@gmail.com>
  *
  * For licensing information see the LICENSE file.
  */
 
 namespace Modules\Form\Elements;
 
-use Modules\Form\FormElement;
+use Modules\Form\AbstractFormElement;
 
-class Textarea extends FormElement
+class Text extends AbstractFormElement
 {
-    public function render(array $options = array())
+    protected function render(array $attributes)
     {
-        $options = $options + $this->options;
-        return sprintf('<textarea%s>%s</textarea>', $this->getHTMLArgList($options), $this->value);
-    }
+        $viewValue = $this->getViewValue();
+        if ($viewValue !== null) {
+            $attributes['value'] = $viewValue;
+        }
 
+        return sprintf('<input type="text"%s />', $this->attributes($attributes));
+    }
 }
