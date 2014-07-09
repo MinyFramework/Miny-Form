@@ -2,7 +2,7 @@
 
 /**
  * This file is part of the Miny framework.
- * (c) Dániel Buga <daniel@bugadani.hu>
+ * (c) Dániel Buga <bugadani@gmail.com>
  *
  * For licensing information see the LICENSE file.
  */
@@ -24,19 +24,6 @@ class Module extends \Miny\Modules\Module
     public function init(BaseApplication $app)
     {
         $container  = $app->getContainer();
-
-        $module = $this;
-        $container->addCallback(
-            __NAMESPACE__ . '\\FormValidator',
-            function (FormValidator $fv, Container $container) use ($module) {
-                $session = $container->get('\\Miny\\HTTP\\Session');
-                if (!isset($session['token'])) {
-                    $session['token'] = sha1(mt_rand());
-                }
-                $module->setConfiguration('csrf_token', $session['token']);
-                $fv->setCSRFToken($session['token']);
-            }
-        );
 
         $this->ifModule(
             'Templating',

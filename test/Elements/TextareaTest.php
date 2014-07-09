@@ -8,7 +8,7 @@ use Modules\Form\Form;
 use Modules\Form\FormService;
 use Modules\Validator\ValidatorService;
 
-class TextTest extends \PHPUnit_Framework_TestCase
+class TextareaTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var FormService
@@ -35,15 +35,16 @@ class TextTest extends \PHPUnit_Framework_TestCase
         $this->object = (object)array('someProperty' => null);
         $this->form   = $this->formService
             ->getFormBuilder($this->object)
-            ->add('someProperty', 'text')
+            ->add('someProperty', 'textarea')
             ->getForm();
+        $this->form->setOption('csrf_protection', false);
     }
 
-    public function testTextField()
+    public function testTextarea()
     {
         $request = new Request('POST', '?', array(), array('someProperty' => 'foo'));
         $this->assertEquals(
-            '<input type="text" name="someProperty" id="someProperty" />',
+            '<textarea name="someProperty" id="someProperty"></textarea>',
             $this->form->get('someProperty')->widget()
         );
 
@@ -51,17 +52,17 @@ class TextTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $this->object->someProperty);
 
         $this->assertEquals(
-            '<input type="text" name="someProperty" id="someProperty" value="foo" />',
+            '<textarea name="someProperty" id="someProperty">foo</textarea>',
             $this->form->get('someProperty')->widget()
         );
     }
 
-    public function testTextFieldWithDefaultData()
+    public function testTextareaWithDefaultData()
     {
         $this->object->someProperty = 'some value';
         $this->form->initialize();
         $this->assertEquals(
-            '<input type="text" name="someProperty" id="someProperty" value="some value" />',
+            '<textarea name="someProperty" id="someProperty">some value</textarea>',
             $this->form->get('someProperty')->widget()
         );
     }

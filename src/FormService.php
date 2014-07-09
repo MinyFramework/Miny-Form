@@ -24,8 +24,19 @@ class FormService
      */
     private $validator;
 
+    /**
+     * @var string[]
+     */
     private $elements = array(
-        'text' => 'Modules\\Form\\Elements\\Text'
+        'button'   => 'Modules\\Form\\Elements\\Button',
+        'checkbox' => 'Modules\\Form\\Elements\\CheckBox',
+        'choice'   => 'Modules\\Form\\Elements\\Choice',
+        'date'     => 'Modules\\Form\\Elements\\Date',
+        'password' => 'Modules\\Form\\Elements\\Password',
+        'reset'    => 'Modules\\Form\\Elements\\ResetButton',
+        'submit'   => 'Modules\\Form\\Elements\\SubmitButton',
+        'text'     => 'Modules\\Form\\Elements\\Text',
+        'textarea' => 'Modules\\Form\\Elements\\Textarea',
     );
 
     public function __construct(Session $session, ValidatorService $validator)
@@ -40,21 +51,22 @@ class FormService
     }
 
     /**
+     * @param Form $form
      * @param string $name
      * @param array  $options
      *
-     * @return AbstractFormElement
      * @throws \OutOfBoundsException
+     * @return AbstractFormElement
      */
-    public function createElement($name, array $options = array())
+    public function createElement(Form $form, $name, array $options = array())
     {
         if (!isset($this->elements[$name])) {
             throw new \OutOfBoundsException("Element {$name} does not exist.");
         }
 
-        $class = new $this->elements[$name];
+        $class = $this->elements[$name];
 
-        return $class($options);
+        return new $class($form, $options);
     }
 
     /**
@@ -71,7 +83,7 @@ class FormService
             throw new \UnexpectedValueException("{$class} does not implement FormBuilderInterface.");
         }
         $form = $object->getForm($this->getFormBuilder($object));
-        if($form instanceof FormBuilder) {
+        if ($form instanceof FormBuilder) {
             return $form->getForm();
         }
         if (!$form instanceof Form) {
@@ -83,7 +95,7 @@ class FormService
     }
 
     /**
-     * @param object $object
+     * @param object|array $object
      *
      * @return FormBuilder
      */

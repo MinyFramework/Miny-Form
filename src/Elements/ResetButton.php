@@ -9,27 +9,14 @@
 
 namespace Modules\Form\Elements;
 
-class SubmitButton extends Button
+class ResetButton extends Button
 {
     protected function getDefaultOptions()
     {
         $options = parent::getDefaultOptions();
 
-        $options['validate_for']       = null;
-        $options['attributes']['type'] = 'submit';
+        $options['attributes']['type'] = 'reset';
 
         return $options;
-    }
-
-    public function toModelValue($viewValue)
-    {
-        $this->form->setCurrentValidationScenario($this->getOption('validate_for'));
-
-        return true;
-    }
-
-    public function clicked()
-    {
-        return $this->getModelValue() === true;
     }
 }

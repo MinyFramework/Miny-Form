@@ -8,7 +8,7 @@ use Modules\Form\Form;
 use Modules\Form\FormService;
 use Modules\Validator\ValidatorService;
 
-class TextTest extends \PHPUnit_Framework_TestCase
+class CheckBoxTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var FormService
@@ -35,35 +35,46 @@ class TextTest extends \PHPUnit_Framework_TestCase
         $this->object = (object)array('someProperty' => null);
         $this->form   = $this->formService
             ->getFormBuilder($this->object)
-            ->add('someProperty', 'text')
+            ->add('someProperty', 'checkbox')
             ->getForm();
+        $this->form->setOption('csrf_protection', false);
     }
 
-    public function testTextField()
+    public function testCheckBox()
     {
-        $request = new Request('POST', '?', array(), array('someProperty' => 'foo'));
-        $this->assertEquals(
-            '<input type="text" name="someProperty" />',
-            $this->form->get('someProperty')->widget()
-        );
-
+        $request = new Request('POST', '?', array(), array());
         $this->form->handle($request);
-        $this->assertEquals('foo', $this->object->someProperty);
+        $this->assertFalse($this->object->someProperty);
 
         $this->assertEquals(
-            '<input type="text" name="someProperty" value="foo" />',
+            '<input type="checkbox" name="someProperty" id="someProperty" />',
+            $this->form->get('someProperty')->widget()
+        );
+
+        $request = new Request('POST', '?', array(), array('someProperty' => 'on'));
+        $this->form->handle($request);
+        $this->assertTrue($this->object->someProperty);
+
+        $this->assertEquals(
+            '<input type="checkbox" name="someProperty" id="someProperty" checked="checked" />',
             $this->form->get('someProperty')->widget()
         );
     }
 
-    public function testTextFieldWithDefaultData()
+    public function testCheckBoxWithModelData()
     {
-        $this->object->someProperty = 'some value';
+        $this->object->someProperty = true;
         $this->form->initialize();
-        $widget = $this->form->get('someProperty')->widget();
         $this->assertEquals(
-            '<input type="text" name="someProperty" value="some value" />',
-            $widget
+            '<input type="checkbox" name="someProperty" id="someProperty" checked="checked" />',
+            $this->form->get('someProperty')->widget()
+        );
+
+        $this->object->someProperty = false;
+        $this->form->initialize();
+        $this->assertEquals(
+            '<input type="checkbox" name="someProperty" id="someProperty" />',
+            $this->form->get('someProperty')->widget()
         );
     }
 }

@@ -10,8 +10,8 @@
         "miny/validator": "dev-master"
     },
     "require-dev": {
-        "bugadani/minty": "dev-master",
-        "miny/templating": "dev-master"
+        "miny/templating": "dev-master",
+        "phpunit/phpunit": "4.1"
     },
     "authors": [
         {

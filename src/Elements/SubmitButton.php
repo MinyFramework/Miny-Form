@@ -9,22 +9,27 @@
 
 namespace Modules\Form\Elements;
 
-use Modules\Form\AbstractFormElement;
-
-class SubmitButton extends AbstractFormElement
+class SubmitButton extends Button
 {
-    protected function render(array $options)
+    protected function getDefaultOptions()
     {
+        $options = parent::getDefaultOptions();
 
+        $options['validate_for']       = null;
+        $options['attributes']['type'] = 'submit';
+
+        return $options;
     }
 
     public function toModelValue($viewValue)
     {
+        $this->form->setCurrentValidationScenario($this->getOption('validate_for'));
+
         return true;
     }
 
     public function clicked()
     {
-        return $this->getModelValue();
+        return $this->getModelValue() === true;
     }
 }

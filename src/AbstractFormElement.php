@@ -1,80 +1,142 @@
 <?php
 
+/**
+ * This file is part of the Miny framework.
+ * (c) Dániel Buga <bugadani@gmail.com>
+ *
+ * For licensing information see the LICENSE file.
+ */
+
 namespace Modules\Form;
 
-use Miny\HTTP\Request;
-use Miny\HTTP\Session;
-use Modules\Validator\ErrorList;
-use Modules\Validator\ValidatorService;
-
-class Form implements \IteratorAggregate
+abstract class AbstractFormElement
 {
-    /**
-     * @var object
-     */
-    private $object;
-
-    /**
-     * @var ValidatorService
-     */
-    private $validator;
-
-    /**
-     * @var Session
-     */
-    private $session;
-
-    /**
-     * @var ErrorList
-     */
-    private $validationErrors;
-
     /**
      * @var array
      */
-    private $elements = array();
+    private $options;
+    private $viewValue;
+    private $modelValue;
+    protected $form;
 
-    public function __construct($object, Session $session, ValidatorService $validator)
+    public function __construct(Form $form, array $options)
     {
-        if (!is_object($object)) {
-            throw new \InvalidArgumentException('$object is not an object.');
+        $this->form    = $form;
+        $this->options = array_merge($this->getDefaultOptions(), $options);
+    }
+
+    public function initialize()
+    {
+        if ($this->getOption('label') === null) {
+            $this->setOption('label', ucwords($this->getOption('name')));
         }
-        $this->object    = $object;
-        $this->validator = $validator;
-        $this->session   = $session;
+        $attributes       = $this->getOption('attributes');
+        $attributes['id'] = $attributes['name'] = $this->getOption('name');
+        $this->setOption('attributes', $attributes);
+        $defaultData = $this->getOption('data');
+        if ($defaultData === null) {
+            $defaultData = $this->getOption('empty_data');
+        }
+        $this->setModelValue($defaultData);
     }
 
-    /**
-     * @param Request      $request
-     * @param string|array $scenario
-     *
-     * @return bool Whether the request was valid
-     */
-    public function handle(Request $request, $scenario = null)
+    public function getOption($key)
     {
-        //fill $this->object
-
-        if (!$this->validator->validate($this->object, $scenario)) {
-            $this->validationErrors = $this->validator->getErrors();
-
-            return false;
+        if (!array_key_exists($key, $this->options)) {
+            throw new \OutOfBoundsException("Option {$key} is not set.");
         }
 
-        $this->validationErrors = null;
-
-        return true;
+        return $this->options[$key];
     }
 
-    public function getValidationErrors()
+    public function setOption($key, $value)
     {
-        return $this->validationErrors;
+        $this->options[$key] = $value;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getIterator()
+    protected function getDefaultOptions()
     {
-        return new \ArrayIterator($this->elements);
+        return array(
+            'attributes'       => array(),
+            'label_attributes' => array(),
+            'empty_data'       => null,
+            'required'         => false,
+            'disabled'         => false,
+            'label'            => null,
+            'data'             => null
+        );
+    }
+
+    public function attributes(array $attributes)
+    {
+        $attributeList = '';
+        foreach ($attributes as $name => $value) {
+            $attributeList .= " {$name}=\"{$value}\"";
+        }
+
+        return $attributeList;
+    }
+
+    public function widget(array $attributes = array())
+    {
+        $attributes = array_merge($this->options['attributes'], $attributes);
+        if ($this->getOption('required')) {
+            $attributes['required'] = 'required';
+        }
+        if ($this->getOption('disabled')) {
+            $attributes['disabled'] = 'disabled';
+        }
+
+        return $this->render($attributes);
+    }
+
+    abstract protected function render(array $attributes);
+
+    public function setViewValue($value)
+    {
+        $this->viewValue  = $value;
+        $this->modelValue = $this->toModelValue($value);
+    }
+
+    public function setModelValue($value)
+    {
+        if (!$this->getOption('disabled')) {
+            $this->modelValue = $value;
+            $this->viewValue  = $this->toViewValue($value);
+        }
+    }
+
+    public function getViewValue()
+    {
+        return $this->viewValue;
+    }
+
+    public function getModelValue()
+    {
+        return $this->modelValue;
+    }
+
+    protected function toModelValue($value)
+    {
+        return $value;
+    }
+
+    protected function toViewValue($value)
+    {
+        return $value;
+    }
+
+    public function getErrors()
+    {
+        $errorList = $this->form->getValidationErrors();
+        if ($errorList === null) {
+            return null;
+        }
+        $name = $this->getOption('name');
+        if (!isset($errorList[$name])) {
+            return null;
+        }
+
+        return $errorList[$name];
     }
 }

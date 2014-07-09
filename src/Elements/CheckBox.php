@@ -9,27 +9,36 @@
 
 namespace Modules\Form\Elements;
 
-class SubmitButton extends Button
+use Modules\Form\AbstractFormElement;
+
+class CheckBox extends AbstractFormElement
 {
     protected function getDefaultOptions()
     {
-        $options = parent::getDefaultOptions();
+        $default = array(
+            'empty_data' => false
+        );
 
-        $options['validate_for']       = null;
-        $options['attributes']['type'] = 'submit';
-
-        return $options;
+        return array_merge(parent::getDefaultOptions(), $default);
     }
 
-    public function toModelValue($viewValue)
+    public function toModelValue($value)
     {
-        $this->form->setCurrentValidationScenario($this->getOption('validate_for'));
-
-        return true;
+        return (bool)$value;
     }
 
-    public function clicked()
+    public function checked()
     {
-        return $this->getModelValue() === true;
+        return $this->getModelValue();
+    }
+
+    protected function render(array $attributes)
+    {
+        $viewValue = $this->getViewValue();
+        if ($viewValue) {
+            $attributes['checked'] = 'checked';
+        }
+
+        return sprintf('<input type="checkbox"%s />', $this->attributes($attributes));
     }
 }

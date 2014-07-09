@@ -2,29 +2,28 @@
 
 /**
  * This file is part of the Miny framework.
- * (c) Dániel Buga <daniel@bugadani.hu>
+ * (c) Dániel Buga <bugadani@gmail.com>
  *
- * For licensing information see the LICENCE file.
+ * For licensing information see the LICENSE file.
  */
 
 namespace Modules\Form;
 
 use Minty\Compiler\TemplateFunction;
-use Miny\Factory\ParameterContainer;
+use Minty\Extension;
 use Modules\Form\Elements\Image;
 use Modules\Form\Elements\Submit;
-use Minty\Extension;
 
 class FormExtension extends Extension
 {
     /**
-     * @var ParameterContainer
+     * @var FormService
      */
-    private $parameterContainer;
+    private $formService;
 
-    public function __construct(ParameterContainer $parameterContainer)
+    public function __construct(FormService $formService)
     {
-        $this->parameterContainer = $parameterContainer;
+        $this->formService = $formService;
     }
 
     public function getExtensionName()
@@ -34,37 +33,102 @@ class FormExtension extends Extension
 
     public function getFunctions()
     {
+        $safe = array('is_safe' => 'html');
+
         return array(
-            new TemplateFunction('button', array($this, 'buttonFunction'), array('is_safe' => 'html')),
+            new TemplateFunction('button', array($this, 'button'), $safe),
+            new TemplateFunction('form', array($this, 'render'), $safe),
+            new TemplateFunction('form_begin', array($this, 'begin'), $safe),
+            new TemplateFunction('form_end', array($this, 'end'), $safe),
+            new TemplateFunction('form_row', array($this, 'row'), $safe),
+            new TemplateFunction('form_label', array($this, 'label'), $safe),
+            new TemplateFunction('form_widget', array($this, 'widget'), $safe),
+            new TemplateFunction('form_error', array($this, 'error'), $safe),
+            new TemplateFunction('form_errors', array($this, 'errors'), $safe),
         );
     }
 
-    public function buttonFunction($url, $method, array $params = array())
+    public function form(Form $form, array $attributes = array(), $scenario = null)
     {
-        if (isset($params['form'])) {
-            $form_params = $params['form'];
-            unset($params['form']);
-        } else {
-            $form_params = array();
+        $output = $this->begin($form, $attributes, $scenario);
+        foreach ($form as $element) {
+            $output .= $this->row($element);
         }
-        $form_params['action'] = $url;
-        $form_params['method'] = $method;
 
-        $descriptor = new FormDescriptor;
-        if (isset($this->parameterContainer['Form:csrf_token'])) {
-            $descriptor->token = $this->parameterContainer['Form']['csrf_token'];
-        }
-        if (isset($params['src'])) {
-            $descriptor->addField(new Image('button', $params['src'], $params));
-        } else {
-            $value = isset($params['value']) ? $params['value'] : null;
-            $descriptor->addField(new Submit('button', $value, $params));
-        }
-        $form   = new FormBuilder($descriptor);
-        $output = $form->begin($form_params);
-        $output .= $form->render('button');
-        $output .= $form->end();
+        return $output . $this->end($form);
+    }
 
-        return $output;
+    public function begin(Form $form, array $attributes = array(), $scenario = null)
+    {
+        return $form->begin($attributes, $scenario);
+    }
+
+    public function end(Form $form)
+    {
+        return $form->end();
+    }
+
+    public function error(AbstractFormElement $element, array $attributes = array())
+    {
+        $attributeList = \Minty\Extensions\template_function_attributes($attributes);
+
+        $output = "<ul{$attributeList}>";
+        foreach ($element->getErrors() as $error) {
+            $output .= "<li>{$error}</li>";
+        }
+
+        return $output . '</ul>';
+    }
+
+    public function errors(Form $form, array $attributes = array())
+    {
+        $attributeList = \Minty\Extensions\template_function_attributes($attributes);
+
+        $output = "<ul{$attributeList}>";
+        foreach ($form as $element) {
+            $output .= "<li>{$element->getOption('label')}: {$this->error($element)}</li>";
+        }
+
+        return $output . '</ul>';
+    }
+
+    public function label(AbstractFormElement $element, array $attributes = array())
+    {
+        $attributes['id']  = 'label_' . $element->getOption('id');
+        $attributes['for'] = $element->getOption('id');
+        $attributeList     = \Minty\Extensions\template_function_attributes($attributes);
+
+        return "<label{$attributeList}>{$element->getOption('label')}</label>";
+    }
+
+    public function widget(AbstractFormElement $element, array $attributes = array())
+    {
+        return $element->widget($attributes);
+    }
+
+    public function row(AbstractFormElement $element, array $attributes = array())
+    {
+        $attributeList = \Minty\Extensions\template_function_attributes($attributes);
+
+        return "<div{$attributeList}>{$this->label($element)}" .
+        "{$this->errors($element)}{$this->widget($element)}</div>";
+    }
+
+    public function button($url, $method, array $attributes = array())
+    {
+        if (isset($attributes['form'])) {
+            $formAttributes = $attributes['form'];
+            unset($attributes['form']);
+        } else {
+            $formAttributes = array();
+        }
+        $formAttributes['action'] = $url;
+        $formAttributes['method'] = $method;
+
+        $form = $this->formService->getFormBuilder(array())
+            ->add('submit', 'submit', array('attributes' => $attributes))
+            ->getForm();
+
+        return $this->form($form, $formAttributes);
     }
 }

@@ -1,25 +1,20 @@
 <?php
 
+/**
+ * This file is part of the Miny framework.
+ * (c) Dániel Buga <bugadani@gmail.com>
+ *
+ * For licensing information see the LICENSE file.
+ */
+
 namespace Modules\Form;
 
-use Miny\HTTP\Request;
-use Miny\HTTP\Session;
-use Modules\Validator\ValidatorService;
-
-class Form
+interface FormBuilderInterface
 {
-    public function __construct($object, Session $session, ValidatorService $validator)
-    {
-        $this->object    = $object;
-        $this->validator = $validator;
-        $this->session   = $session;
-    }
-
-    public function handle(Request $request)
-    {
-    }
-
-    public function valid()
-    {
-    }
+    /**
+     * @param FormBuilder $formBuilder
+     *
+     * @return Form|FormBuilder
+     */
+    public function getForm(FormBuilder $formBuilder);
 }

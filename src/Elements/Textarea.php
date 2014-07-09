@@ -11,15 +11,14 @@ namespace Modules\Form\Elements;
 
 use Modules\Form\AbstractFormElement;
 
-class Text extends AbstractFormElement
+class Textarea extends AbstractFormElement
 {
     protected function render(array $attributes)
     {
-        $viewValue = $this->getViewValue();
-        if ($viewValue !== null) {
-            $attributes['value'] = $viewValue;
-        }
-
-        return sprintf('<input type="text"%s />', $this->attributes($attributes));
+        return sprintf(
+            '<textarea%s>%s</textarea>',
+            $this->attributes($attributes),
+            $this->getViewValue()
+        );
     }
 }

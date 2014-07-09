@@ -8,7 +8,7 @@ use Modules\Form\Form;
 use Modules\Form\FormService;
 use Modules\Validator\ValidatorService;
 
-class TextTest extends \PHPUnit_Framework_TestCase
+class PasswordTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var FormService
@@ -35,15 +35,16 @@ class TextTest extends \PHPUnit_Framework_TestCase
         $this->object = (object)array('someProperty' => null);
         $this->form   = $this->formService
             ->getFormBuilder($this->object)
-            ->add('someProperty', 'text')
+            ->add('someProperty', 'password')
             ->getForm();
+        $this->form->setOption('csrf_protection', false);
     }
 
-    public function testTextField()
+    public function testPasswordField()
     {
         $request = new Request('POST', '?', array(), array('someProperty' => 'foo'));
         $this->assertEquals(
-            '<input type="text" name="someProperty" />',
+            '<input type="password" name="someProperty" id="someProperty" />',
             $this->form->get('someProperty')->widget()
         );
 
@@ -51,18 +52,18 @@ class TextTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $this->object->someProperty);
 
         $this->assertEquals(
-            '<input type="text" name="someProperty" value="foo" />',
+            '<input type="password" name="someProperty" id="someProperty" />',
             $this->form->get('someProperty')->widget()
         );
     }
 
-    public function testTextFieldWithDefaultData()
+    public function testPasswordFieldShouldNotHaveDefaultData()
     {
         $this->object->someProperty = 'some value';
         $this->form->initialize();
         $widget = $this->form->get('someProperty')->widget();
         $this->assertEquals(
-            '<input type="text" name="someProperty" value="some value" />',
+            '<input type="password" name="someProperty" id="someProperty" />',
             $widget
         );
     }
