@@ -192,7 +192,8 @@ class DateTest extends \PHPUnit_Framework_TestCase
             new Request('POST', '?', array(), array('someProperty' => '2010-05-06'))
         );
 
-        $this->assertEquals(1273096800, $this->object->someProperty);
+        $dateTime = \DateTime::createFromFormat('Y-m-d H:i:s', '2010-05-06 00:00:00');
+        $this->assertEquals($dateTime->format('U'), $this->object->someProperty);
 
         $this->form->get('someProperty')->setOption('widget', 'textfields');
         $this->form->handle(
@@ -206,7 +207,8 @@ class DateTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-        $this->assertEquals(1273183200, $this->object->someProperty);
+        $dateTime = \DateTime::createFromFormat('Y-m-d H:i:s', '2010-05-07 00:00:00');
+        $this->assertEquals($dateTime->format('U'), $this->object->someProperty);
 
         //choice sends indexes
         $this->form->get('someProperty')->setOption('years', array('2010', '2011'));
@@ -222,7 +224,8 @@ class DateTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-        $this->assertEquals(1299106800, $this->object->someProperty);
+        $dateTime = \DateTime::createFromFormat('Y-m-d H:i:s', '2011-03-03 00:00:00');
+        $this->assertEquals($dateTime->format('U'), $this->object->someProperty);
     }
 
     public function testDateCanReturnDateString()
