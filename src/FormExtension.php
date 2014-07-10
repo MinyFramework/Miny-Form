@@ -94,8 +94,10 @@ class FormExtension extends Extension
 
     public function label(AbstractFormElement $element, array $attributes = array())
     {
-        $attributes['id']  = 'label_' . $element->getOption('id');
-        $attributes['for'] = $element->getOption('id');
+        $defaultAttributes = $element->getOption('attributes');
+
+        $attributes['id']  = 'label_' . $defaultAttributes['id'];
+        $attributes['for'] = $defaultAttributes['id'];
         $attributeList     = \Minty\Extensions\template_function_attributes($attributes);
 
         return "<label{$attributeList}>{$element->getOption('label')}</label>";
@@ -111,7 +113,7 @@ class FormExtension extends Extension
         $attributeList = \Minty\Extensions\template_function_attributes($attributes);
 
         return "<div{$attributeList}>{$this->label($element)}" .
-        "{$this->errors($element)}{$this->widget($element)}</div>";
+        "{$this->error($element)}{$this->widget($element)}</div>";
     }
 
     public function button($url, $method, array $attributes = array())
