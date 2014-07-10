@@ -28,6 +28,16 @@ class FormBuilder
         $this->form = new Form($object, $formService->getSession(), $formService->getValidator());
     }
 
+    public function get($option, $scenario = null)
+    {
+        return $this->form->getOption($option, $scenario);
+    }
+
+    public function set($option, $value, $scenario = null)
+    {
+        $this->form->setOption($option, $value, $scenario);
+    }
+
     public function add($property, $type, array $options = array())
     {
         $element = $this->formService->createElement($this->form, $type, $options);
