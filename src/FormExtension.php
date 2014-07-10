@@ -70,6 +70,9 @@ class FormExtension extends Extension
 
     public function error(AbstractFormElement $element, array $attributes = array())
     {
+        if ($element->getErrors() === null) {
+            return '';
+        }
         $attributeList = \Minty\Extensions\template_function_attributes($attributes);
 
         $output = "<ul{$attributeList}>";
@@ -82,6 +85,9 @@ class FormExtension extends Extension
 
     public function errors(Form $form, array $attributes = array())
     {
+        if ($form->isValid()) {
+            return '';
+        }
         $attributeList = \Minty\Extensions\template_function_attributes($attributes);
 
         $output = "<ul{$attributeList}>";
