@@ -116,7 +116,7 @@ class Form implements \IteratorAggregate
     public function getOption($key, $scenario = null)
     {
         $scenario = $scenario ? : $this->currentScenario;
-        if (!isset($this->options[$scenario][$key])) {
+        if (!array_key_exists($key, $this->options[$scenario])) {
             throw new \OutOfBoundsException("Key {$key} is not set for scenario '{$scenario}'");
         }
 
