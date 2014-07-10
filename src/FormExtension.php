@@ -11,8 +11,6 @@ namespace Modules\Form;
 
 use Minty\Compiler\TemplateFunction;
 use Minty\Extension;
-use Modules\Form\Elements\Image;
-use Modules\Form\Elements\Submit;
 
 class FormExtension extends Extension
 {
