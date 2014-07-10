@@ -77,6 +77,17 @@ abstract class AbstractFormElement
         return $attributeList;
     }
 
+    public function label(array $attributes = array())
+    {
+        $attributes        = array_merge($this->options['label_attributes'], $attributes);
+        $defaultAttributes = $this->getOption('attributes');
+
+        $attributes['id']  = 'label_' . $defaultAttributes['id'];
+        $attributes['for'] = $defaultAttributes['id'];
+
+        return "<label{$this->attributes($attributes)}>{$this->getOption('label')}</label>";
+    }
+
     public function widget(array $attributes = array())
     {
         $attributes = array_merge($this->options['attributes'], $attributes);

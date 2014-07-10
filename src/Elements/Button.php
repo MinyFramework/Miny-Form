@@ -13,6 +13,10 @@ use Modules\Form\AbstractFormElement;
 
 class Button extends AbstractFormElement
 {
+    public function label(array $attributes = array())
+    {
+    }
+
     protected function render(array $attributes)
     {
         return sprintf(
