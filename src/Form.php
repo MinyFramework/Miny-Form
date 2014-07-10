@@ -320,7 +320,8 @@ class Form implements \IteratorAggregate
         }
         $output .= '>';
         if ($this->getOption('csrf_protection', $this->currentScenario)) {
-            if (!isset($this->session->csrf_token)) {
+            if (!isset($this->session->has_csrf_token)) {
+                $this->session->flash('has_csrf_token', true, 0);
                 $this->session->csrf_token = sha1(mt_rand() . microtime());
             }
             $output .= sprintf(
