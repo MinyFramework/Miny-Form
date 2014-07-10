@@ -82,16 +82,10 @@ class FormService
             $class = get_class($object);
             throw new \UnexpectedValueException("{$class} does not implement FormBuilderInterface.");
         }
-        $form = $object->getForm($this->getFormBuilder($object));
-        if ($form instanceof FormBuilder) {
-            return $form->getForm();
-        }
-        if (!$form instanceof Form) {
-            $class = get_class($object);
-            throw new \UnexpectedValueException("{$class} does not implement FormBuilderInterface properly.");
-        }
+        $formBuilder = $this->getFormBuilder($object);
+        $object->getForm($formBuilder);
 
-        return $form;
+        return $formBuilder->getForm();
     }
 
     /**
