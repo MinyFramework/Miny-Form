@@ -122,10 +122,10 @@ class FormExtension extends Extension
         } else {
             $formAttributes = array();
         }
-        $formAttributes['action'] = $url;
-        $formAttributes['method'] = $method;
 
         $form = $this->formService->getFormBuilder(array())
+            ->set('action', $url)
+            ->set('method', $method)
             ->add('submit', 'submit', array('attributes' => $attributes))
             ->getForm();
 

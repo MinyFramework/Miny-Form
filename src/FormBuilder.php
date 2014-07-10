@@ -36,6 +36,8 @@ class FormBuilder
     public function set($option, $value, $scenario = null)
     {
         $this->form->setOption($option, $value, $scenario);
+
+        return $this;
     }
 
     public function add($property, $type, array $options = array())

@@ -243,6 +243,11 @@ class Form implements \IteratorAggregate
         return $this->validationErrors === null;
     }
 
+    public function isSubmitted()
+    {
+        return $this->validationErrors !== false;
+    }
+
     public function getValidationErrors()
     {
         return $this->validationErrors;
@@ -304,11 +309,17 @@ class Form implements \IteratorAggregate
     public function begin(array $attributes = array(), $scenario = null)
     {
         $this->setCurrentScenario($scenario);
+        $method = $this->getOption('method');
+        if ($method !== 'GET' && $method !== 'POST') {
+            $methodAttribute = 'POST';
+        } else {
+            $methodAttribute = $method;
+        }
         $attributes = array_merge(
             $attributes,
             array(
                 'action' => $this->getOption('action'),
-                'method' => $this->getOption('method')
+                'method' => $methodAttribute
             )
         );
         if ($this->getOption('validate_for') === false) {
@@ -319,6 +330,9 @@ class Form implements \IteratorAggregate
             $output .= " {$name}=\"{$value}\"";
         }
         $output .= '>';
+        if ($method !== 'GET' && $method !== 'POST') {
+            $output .= '<input type="hidden" name="_method" value="' . $method . '" />';
+        }
         if ($this->getOption('csrf_protection', $this->currentScenario)) {
             if (!isset($this->session->has_csrf_token)) {
                 $this->session->flash('has_csrf_token', true, 0);

@@ -139,7 +139,7 @@ abstract class AbstractFormElement
 
     public function getErrors()
     {
-        if ($this->form->isValid()) {
+        if ($this->form->isValid() || !$this->form->isSubmitted()) {
             return null;
         }
 
