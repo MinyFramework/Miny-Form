@@ -250,6 +250,11 @@ class Form implements \IteratorAggregate
         return $this->validationErrors;
     }
 
+    public function getFormData()
+    {
+        return $this->data;
+    }
+
     public function get($property)
     {
         if (!isset($this->elements[$property])) {
