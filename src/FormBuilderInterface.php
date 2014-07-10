@@ -13,8 +13,6 @@ interface FormBuilderInterface
 {
     /**
      * @param FormBuilder $formBuilder
-     *
-     * @return Form|FormBuilder
      */
     public function getForm(FormBuilder $formBuilder);
 }
