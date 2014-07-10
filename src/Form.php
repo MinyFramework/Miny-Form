@@ -20,7 +20,7 @@ class Form implements \IteratorAggregate
     /**
      * @var object
      */
-    private $object;
+    private $data;
 
     /**
      * @var ValidatorService
@@ -61,12 +61,9 @@ class Form implements \IteratorAggregate
     );
     private $currentValidationScenario;
 
-    public function __construct($object, Session $session, ValidatorService $validator)
+    public function __construct($data, Session $session, ValidatorService $validator)
     {
-        if (!is_object($object)) {
-            throw new \InvalidArgumentException('$object is not an object.');
-        }
-        $this->object    = $object;
+        $this->data = $data;
         $this->validator = $validator;
         $this->session   = $session;
     }
@@ -182,7 +179,7 @@ class Form implements \IteratorAggregate
         }
 
         if ($this->currentValidationScenario !== false) {
-            if (!$this->validator->validate($this->object, $this->currentValidationScenario)) {
+            if (!$this->validator->validate($this->data, $this->currentValidationScenario)) {
                 $this->validationErrors = $this->validator->getErrors();
 
                 return false;
@@ -200,14 +197,14 @@ class Form implements \IteratorAggregate
      */
     private function setProperty($property, $value)
     {
-        if (is_array($this->object)) {
-            $this->object[$property] = $value;
-        } elseif (property_exists($this->object, $property)) {
-            $this->object->$property = $value;
+        if (is_array($this->data)) {
+            $this->data[$property] = $value;
+        } elseif (property_exists($this->data, $property)) {
+            $this->data->$property = $value;
         } else {
             $setter = 'set' . ucfirst($property);
-            if (method_exists($this->object, $setter)) {
-                $this->object->$setter($value);
+            if (method_exists($this->data, $setter)) {
+                $this->data->$setter($value);
             }
         }
     }
@@ -221,16 +218,16 @@ class Form implements \IteratorAggregate
      */
     private function getProperty($property)
     {
-        if (is_array($this->object) && isset($this->object[$property])) {
-            return $this->object[$property];
-        } elseif (property_exists($this->object, $property)) {
-            return $this->object->$property;
+        if (is_array($this->data)) {
+            return isset($this->data[$property]) ? $this->data[$property] : null;
+        } elseif (property_exists($this->data, $property)) {
+            return $this->data->$property;
         } else {
             $name = ucfirst($property);
             foreach (array('get', 'has', 'is') as $prefix) {
                 $getter = $prefix . $name;
-                if (method_exists($this->object, $getter)) {
-                    return $this->object->$getter();
+                if (method_exists($this->data, $getter)) {
+                    return $this->data->$getter();
                 }
             }
         }
