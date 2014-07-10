@@ -32,7 +32,7 @@ class FormExtension extends Extension
     public function getFunctions()
     {
         $safe = array('is_safe' => 'html');
-        $ns = __NAMESPACE__;
+        $ns = '\\' . __NAMESPACE__;
 
         return array(
             new TemplateFunction('button', array($this, 'button'), $safe),
