@@ -9,6 +9,8 @@
 
 namespace Modules\Form\Elements;
 
+use Modules\Form\AttributeSet;
+
 class SubmitButton extends Button
 {
     protected function getDefaultOptions()
@@ -21,19 +23,19 @@ class SubmitButton extends Button
         return $options;
     }
 
-    protected function render(array $attributes)
+    protected function render(AttributeSet $attributes)
     {
         $widget = $this->getOption('widget');
         switch ($widget) {
             case 'button':
-                $attributes['type'] = 'submit';
+                $attributes->add('type', 'submit');
 
                 return parent::render($attributes);
             case 'image':
-                $attributes['type'] = 'image';
-                $attributes['src']  = $this->getOption('label');
+                $attributes->add('type', 'image');
+                $attributes->add('src', $this->getOption('label'));
 
-                return sprintf('<input%s />', $this->attributes($attributes));
+                return sprintf('<input%s />', $attributes);
 
             default:
                 throw new \InvalidArgumentException("Invalid submit button widget: {$widget}");

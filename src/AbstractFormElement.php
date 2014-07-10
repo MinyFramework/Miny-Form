@@ -30,9 +30,11 @@ abstract class AbstractFormElement
         if ($this->getOption('label') === null) {
             $this->setOption('label', ucwords($this->getOption('name')));
         }
-        $attributes       = $this->getOption('attributes');
-        $attributes['id'] = $attributes['name'] = $this->getOption('name');
-        $this->setOption('attributes', $attributes);
+
+        $attributes = $this->getOption('attributes');
+        $attributes->add('name', $this->getOption('name'));
+        $attributes->add('id', $this->getOption('name'));
+
         $this->setModelValue(
             $this->getDefaultData()
         );
@@ -64,8 +66,8 @@ abstract class AbstractFormElement
     protected function getDefaultOptions()
     {
         return array(
-            'attributes'       => array(),
-            'label_attributes' => array(),
+            'attributes'       => new AttributeSet(),
+            'label_attributes' => new AttributeSet(),
             'empty_data'       => null,
             'required'         => false,
             'disabled'         => false,
@@ -76,39 +78,42 @@ abstract class AbstractFormElement
 
     public function attributes(array $attributes)
     {
-        $attributeList = '';
-        foreach ($attributes as $name => $value) {
-            $attributeList .= " {$name}=\"{$value}\"";
-        }
-
-        return $attributeList;
+        return AttributeSet::getAttributeString($attributes);
     }
 
-    public function label(array $attributes = array())
+    public function label(AttributeSet $attributes = null)
     {
-        $attributes        = array_merge($this->options['label_attributes'], $attributes);
+        if (!$attributes) {
+            $attributes = new AttributeSet();
+        }
+        $attributes->addMultiple($this->getOption('label_attributes'));
+
         $defaultAttributes = $this->getOption('attributes');
 
-        $attributes['id']  = 'label_' . $defaultAttributes['id'];
-        $attributes['for'] = $defaultAttributes['id'];
+        $attributes->add('id', 'label_' . $defaultAttributes['id']);
+        $attributes->add('for', $defaultAttributes['id']);
 
-        return "<label{$this->attributes($attributes)}>{$this->getOption('label')}</label>";
+        return "<label{$attributes}>{$this->getOption('label')}</label>";
     }
 
-    public function widget(array $attributes = array())
+    public function widget(AttributeSet $attributes = null)
     {
-        $attributes = array_merge($this->options['attributes'], $attributes);
+        if (!$attributes) {
+            $attributes = new AttributeSet();
+        }
+        $attributes->addMultiple($this->getOption('attributes'));
+
         if ($this->getOption('required')) {
-            $attributes['required'] = 'required';
+            $attributes->add('required', 'required');
         }
         if ($this->getOption('disabled')) {
-            $attributes['disabled'] = 'disabled';
+            $attributes->add('disabled', 'disabled');
         }
 
         return $this->render($attributes);
     }
 
-    abstract protected function render(array $attributes);
+    abstract protected function render(AttributeSet $attributes);
 
     public function setViewValue($value)
     {

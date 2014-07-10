@@ -15,7 +15,7 @@ class ResetButton extends Button
     {
         $options = parent::getDefaultOptions();
 
-        $options['attributes']['type'] = 'reset';
+        $options['attributes']->add('type', 'reset');
 
         return $options;
     }

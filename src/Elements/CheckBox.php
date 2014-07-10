@@ -10,6 +10,7 @@
 namespace Modules\Form\Elements;
 
 use Modules\Form\AbstractFormElement;
+use Modules\Form\AttributeSet;
 
 class CheckBox extends AbstractFormElement
 {
@@ -32,13 +33,13 @@ class CheckBox extends AbstractFormElement
         return $this->getModelValue();
     }
 
-    protected function render(array $attributes)
+    protected function render(AttributeSet $attributes)
     {
         $viewValue = $this->getViewValue();
         if ($viewValue) {
-            $attributes['checked'] = 'checked';
+            $attributes->add('checked', 'checked');
         }
 
-        return sprintf('<input type="checkbox"%s />', $this->attributes($attributes));
+        return sprintf('<input type="checkbox"%s />', $attributes);
     }
 }

@@ -46,9 +46,10 @@ class CheckBoxTest extends \PHPUnit_Framework_TestCase
         $this->form->handle($request);
         $this->assertFalse($this->object->someProperty);
 
+        $widget = $this->form->get('someProperty')->widget();
         $this->assertEquals(
             '<input type="checkbox" name="someProperty" id="someProperty" />',
-            $this->form->get('someProperty')->widget()
+            $widget
         );
 
         $request = new Request('POST', '?', array(), array('someProperty' => 'on'));

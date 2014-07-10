@@ -10,6 +10,7 @@
 namespace Modules\Form\Elements;
 
 use Modules\Form\AbstractFormElement;
+use Modules\Form\AttributeSet;
 
 class Choice extends AbstractFormElement
 {
@@ -81,7 +82,7 @@ class Choice extends AbstractFormElement
         parent::initialize();
     }
 
-    public function widget(array $attributes = array())
+    public function widget(AttributeSet $attributes = null)
     {
         if (isset($attributes['separator'])) {
             $this->setOption('separator', $attributes['separator']);
@@ -91,7 +92,7 @@ class Choice extends AbstractFormElement
         return parent::widget($attributes);
     }
 
-    protected function render(array $attributes)
+    protected function render(AttributeSet $attributes)
     {
         $multiple = $this->getOption('multiple');
 
@@ -104,7 +105,7 @@ class Choice extends AbstractFormElement
         }
     }
 
-    private function renderSelect($multiple, $attributes)
+    private function renderSelect($multiple, AttributeSet $attributes)
     {
         $options = array();
         $values  = $this->getViewValue();
@@ -130,13 +131,13 @@ class Choice extends AbstractFormElement
         }
 
         if ($multiple) {
-            $attributes['multiple'] = 'multiple';
-            $attributes['name'] .= '[]';
+            $attributes->add('multiple', 'multiple');
+            $attributes->append('name', '[]');
         }
 
         return sprintf(
             '<select%s>%s</select>',
-            $this->attributes($attributes),
+            $attributes,
             implode('', $options)
         );
     }
@@ -149,13 +150,17 @@ class Choice extends AbstractFormElement
             $optionAttributes['selected'] = 'selected';
         }
 
-        return sprintf('<option%s>%s</option>', $this->attributes($optionAttributes), $label);
+        return sprintf(
+            '<option%s>%s</option>',
+            AttributeSet::getAttributeString($optionAttributes),
+            $label
+        );
     }
 
-    private function getItemAttributes($multiple, $attributes)
+    private function getItemAttributes($multiple, AttributeSet $attributes)
     {
-        if (isset($attributes['option_attributes'])) {
-            $itemAttributes = (array)$attributes['option_attributes'];
+        if ($attributes->has('option_attributes')) {
+            $itemAttributes = (array)$attributes->get('option_attributes');
         } else {
             $itemAttributes = array();
         }
@@ -165,26 +170,28 @@ class Choice extends AbstractFormElement
             $itemAttributes['name'] .= '[]';
         }
 
-        return $itemAttributes;
+        return new AttributeSet($itemAttributes);
     }
 
-    private function renderInputList($itemAttributes)
+    private function renderInputList(AttributeSet $itemAttributes)
     {
         $options  = array();
         $values   = $this->getViewValue();
         $callback = $this->checkedCallback;
 
         foreach ($this->getOption('choices') as $key => $label) {
-            $attributes          = $itemAttributes;
-            $attributes['value'] = $key;
-            $attributes['id'] .= '_' . $key;
+            $attributes = clone $itemAttributes;
+
+            $attributes->add('value', $key);
+            $attributes->append('id', '_' . $key);
+
             if ($callback($key, $values)) {
-                $attributes['checked'] = 'checked';
+                $attributes->add('checked', 'checked');
             }
             $options[] = sprintf(
                 '<input%s /><label for="%s">%s</label>',
-                $this->attributes($attributes),
-                $attributes['id'],
+                $attributes,
+                $attributes->get('id'),
                 $label
             );
         }

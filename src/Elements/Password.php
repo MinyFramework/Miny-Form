@@ -10,11 +10,12 @@
 namespace Modules\Form\Elements;
 
 use Modules\Form\AbstractFormElement;
+use Modules\Form\AttributeSet;
 
 class Password extends AbstractFormElement
 {
-    protected function render(array $attributes)
+    protected function render(AttributeSet $attributes)
     {
-        return sprintf('<input type="password"%s />', $this->attributes($attributes));
+        return sprintf('<input type="password"%s />', $attributes);
     }
 }

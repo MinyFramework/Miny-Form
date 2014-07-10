@@ -10,14 +10,15 @@
 namespace Modules\Form\Elements;
 
 use Modules\Form\AbstractFormElement;
+use Modules\Form\AttributeSet;
 
 class Textarea extends AbstractFormElement
 {
-    protected function render(array $attributes)
+    protected function render(AttributeSet $attributes)
     {
         return sprintf(
             '<textarea%s>%s</textarea>',
-            $this->attributes($attributes),
+            $attributes,
             $this->getViewValue()
         );
     }

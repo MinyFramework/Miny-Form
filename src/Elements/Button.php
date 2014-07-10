@@ -10,18 +10,19 @@
 namespace Modules\Form\Elements;
 
 use Modules\Form\AbstractFormElement;
+use Modules\Form\AttributeSet;
 
 class Button extends AbstractFormElement
 {
-    public function label(array $attributes = array())
+    public function label(AttributeSet $attributes = null)
     {
     }
 
-    protected function render(array $attributes)
+    protected function render(AttributeSet $attributes)
     {
         return sprintf(
             '<button%s>%s</button>',
-            $this->attributes($attributes),
+            $attributes,
             $this->getOption('label')
         );
     }

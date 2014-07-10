@@ -92,22 +92,20 @@ class DateTest extends \PHPUnit_Framework_TestCase
 
         $element->setOption('empty_data', '2010-05-07');
         $this->form->initialize();
-        $widget = $element->widget();
         $this->assertEquals(
             '<input type="text" name="someProperty[year]" id="someProperty_year" value="2010" />' .
             '<input type="text" name="someProperty[month]" id="someProperty_month" value="05" />' .
             '<input type="text" name="someProperty[day]" id="someProperty_day" value="07" />',
-            $widget
+            $element->widget()
         );
 
         $this->object->someProperty = '2010-05-06';
         $this->form->initialize();
-        $widget = $element->widget();
         $this->assertEquals(
             '<input type="text" name="someProperty[year]" id="someProperty_year" value="2010" />' .
             '<input type="text" name="someProperty[month]" id="someProperty_month" value="05" />' .
             '<input type="text" name="someProperty[day]" id="someProperty_day" value="06" />',
-            $widget
+            $element->widget()
         );
     }
 

@@ -71,7 +71,7 @@ class FormExtension extends Extension
         if ($element->getErrors() === null) {
             return '';
         }
-        $attributeList = \Minty\Extensions\template_function_attributes($attributes);
+        $attributeList = AttributeSet::getAttributeString($attributes);
 
         $output = "<ul{$attributeList}>";
         foreach ($element->getErrors() as $error) {
@@ -86,7 +86,7 @@ class FormExtension extends Extension
         if ($form->isValid()) {
             return '';
         }
-        $attributeList = \Minty\Extensions\template_function_attributes($attributes);
+        $attributeList = AttributeSet::getAttributeString($attributes);
 
         $output = "<ul{$attributeList}>";
         foreach ($form as $element) {
@@ -98,17 +98,17 @@ class FormExtension extends Extension
 
     public function label(AbstractFormElement $element, array $attributes = array())
     {
-        return $element->label($attributes);
+        return $element->label(new AttributeSet($attributes));
     }
 
     public function widget(AbstractFormElement $element, array $attributes = array())
     {
-        return $element->widget($attributes);
+        return $element->widget(new AttributeSet($attributes));
     }
 
     public function row(AbstractFormElement $element, array $attributes = array())
     {
-        $attributeList = \Minty\Extensions\template_function_attributes($attributes);
+        $attributeList = AttributeSet::getAttributeString($attributes);
 
         return "<div{$attributeList}>{$this->label($element)}" .
         "{$this->error($element)}{$this->widget($element)}</div>";

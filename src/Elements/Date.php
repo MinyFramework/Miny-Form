@@ -10,6 +10,7 @@
 namespace Modules\Form\Elements;
 
 use Modules\Form\AbstractFormElement;
+use Modules\Form\AttributeSet;
 
 class Date extends AbstractFormElement
 {
@@ -152,7 +153,7 @@ class Date extends AbstractFormElement
         }
     }
 
-    protected function render(array $attributes)
+    protected function render(AttributeSet $attributes)
     {
         $widget = $this->getOption('widget');
         switch ($widget) {
@@ -171,31 +172,30 @@ class Date extends AbstractFormElement
     }
 
     /**
-     * @param array $attributes
+     * @param AttributeSet $attributes
      *
      * @return string
      */
-    protected function renderTextfield(array $attributes)
+    protected function renderTextfield(AttributeSet $attributes)
     {
         $viewValue = $this->getViewValue();
         if ($viewValue !== null) {
-            $attributes['value'] = $viewValue;
+            $attributes->add('value', $viewValue);
         }
 
-        $attributeList = $this->attributes($attributes);
         if ($this->getOption('format') === 'Y-m-d') {
-            return sprintf('<input type="date"%s />', $attributeList);
+            return sprintf('<input type="date"%s />', $attributes);
         } else {
-            return sprintf('<input type="text"%s />', $attributeList);
+            return sprintf('<input type="text"%s />', $attributes);
         }
     }
 
     /**
-     * @param array $attributes
+     * @param AttributeSet $attributes
      *
      * @return string
      */
-    protected function renderTextfields(array $attributes)
+    protected function renderTextfields(AttributeSet $attributes)
     {
         $viewValue = $this->getViewValue();
         if ($viewValue === null) {
@@ -208,25 +208,25 @@ class Date extends AbstractFormElement
 
         $output = '';
         foreach ($this->getOption('field_order') as $key) {
-            $attr = $attributes;
-            $attr['name'] .= "[{$key}]";
-            $attr['id'] .= "_{$key}";
+            $attr = clone $attributes;
+            $attr->append('name', "[{$key}]");
+            $attr->append('id', '_' . $key);
+
             if ($viewValue[$key] !== '') {
-                $attr['value'] = $viewValue[$key];
+                $attr->add('value', $viewValue[$key]);
             }
-            $attributeList = $this->attributes($attr);
-            $output .= sprintf('<input type="text"%s />', $attributeList);
+            $output .= sprintf('<input type="text"%s />', $attr);
         }
 
         return $output;
     }
 
     /**
-     * @param array $attributes
+     * @param AttributeSet $attributes
      *
      * @return string
      */
-    protected function renderChoices(array $attributes)
+    protected function renderChoices(AttributeSet $attributes)
     {
         $viewValue = $this->getViewValue();
         if ($viewValue === null) {
@@ -244,11 +244,12 @@ class Date extends AbstractFormElement
         }
         $output = '';
         foreach ($this->getOption('field_order') as $key) {
-            $attr = $attributes;
-            $attr['name'] .= "[{$key}]";
-            $attr['id'] .= "_{$key}";
-            $attributeList = $this->attributes($attr);
-            $options       = array();
+            $attr = clone $attributes;
+
+            $attr->append('name', "[{$key}]");
+            $attr->append('id', '_' . $key);
+
+            $options = array();
             foreach ($this->getOption($key . 's') as $item => $label) {
                 $optionAttrs = array('value' => $item);
 
@@ -257,11 +258,11 @@ class Date extends AbstractFormElement
                 }
                 $options[] = sprintf(
                     '<option%s>%s</option>',
-                    $this->attributes($optionAttrs),
+                    AttributeSet::getAttributeString($optionAttrs),
                     $label
                 );
             }
-            $output .= sprintf('<select%s>%s</select>', $attributeList, implode('', $options));
+            $output .= sprintf('<select%s>%s</select>', $attr, implode('', $options));
         }
 
         return $output;

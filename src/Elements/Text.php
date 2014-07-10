@@ -10,16 +10,17 @@
 namespace Modules\Form\Elements;
 
 use Modules\Form\AbstractFormElement;
+use Modules\Form\AttributeSet;
 
 class Text extends AbstractFormElement
 {
-    protected function render(array $attributes)
+    protected function render(AttributeSet $attributes)
     {
         $viewValue = $this->getViewValue();
         if ($viewValue !== null) {
-            $attributes['value'] = $viewValue;
+            $attributes->add('value', $viewValue);
         }
 
-        return sprintf('<input type="text"%s />', $this->attributes($attributes));
+        return sprintf('<input type="text"%s />', $attributes);
     }
 }
