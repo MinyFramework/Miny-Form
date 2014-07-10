@@ -89,9 +89,10 @@ abstract class AbstractFormElement
         $attributes->addMultiple($this->getOption('label_attributes'));
 
         $defaultAttributes = $this->getOption('attributes');
+        $idAttribute = $defaultAttributes->get('id');
 
-        $attributes->add('id', 'label_' . $defaultAttributes['id']);
-        $attributes->add('for', $defaultAttributes['id']);
+        $attributes->add('id', 'label_' . $idAttribute);
+        $attributes->add('for', $idAttribute);
 
         return "<label{$attributes}>{$this->getOption('label')}</label>";
     }
