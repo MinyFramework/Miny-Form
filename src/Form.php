@@ -129,8 +129,10 @@ class Form implements \IteratorAggregate
     {
         $this->currentValidationScenario = null;
 
-        $scenario = $scenario ? : $this->currentScenario;
-        $method   = strtoupper($this->getOption('method', $scenario));
+        if ($scenario !== null) {
+            $this->currentScenario = $scenario;
+        }
+        $method = strtoupper($this->getOption('method', $this->currentScenario));
         if ($request->getMethod() !== $method) {
             return false;
         }
@@ -139,7 +141,7 @@ class Form implements \IteratorAggregate
         } else {
             $container = $request->post();
         }
-        if (!$this->csrfTokenPresent($container, $scenario)) {
+        if (!$this->csrfTokenPresent($container, $this->currentScenario)) {
             return false;
         }
 
@@ -151,7 +153,7 @@ class Form implements \IteratorAggregate
             $this->setProperty($property, $element->getModelValue());
         }
 
-        return $this->validateRequest($scenario);
+        return $this->validateRequest($this->currentScenario);
     }
 
     /**
@@ -161,6 +163,7 @@ class Form implements \IteratorAggregate
      */
     private function validateRequest($scenario)
     {
+        //null if not set by user - use configuration
         if ($this->currentValidationScenario === null) {
             if ($this->hasOption('validate_for', $scenario)) {
                 $this->currentValidationScenario = $this->getOption('validate_for', $scenario);
@@ -169,6 +172,7 @@ class Form implements \IteratorAggregate
             }
         }
 
+        //false if validation is disabled
         if ($this->currentValidationScenario !== false) {
             if (!$this->validator->validate($this->data, $this->currentValidationScenario)) {
                 $this->validationErrors = $this->validator->getErrors();
@@ -305,7 +309,9 @@ class Form implements \IteratorAggregate
 
     public function begin(array $attributes = array(), $scenario = null)
     {
-        $this->setCurrentScenario($scenario);
+        if ($scenario !== null) {
+            $this->currentScenario = $scenario;
+        }
         $method     = $this->getOption('method');
         $attributes = $this->getFormAttributes($attributes, $method);
         $output     = $this->getFormOpeningTag($attributes, $method);
@@ -333,7 +339,7 @@ class Form implements \IteratorAggregate
         }
         $attributes = new AttributeSet($attributes);
         $attributes->addMultiple(
-        array(
+            array(
                 'action' => $this->getOption('action'),
                 'method' => $methodAttribute
             )
