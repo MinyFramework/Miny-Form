@@ -139,15 +139,12 @@ abstract class AbstractFormElement
 
     public function getErrors()
     {
-        $errorList = $this->form->getValidationErrors();
-        if ($errorList === null) {
-            return null;
-        }
-        $name = $this->getOption('name');
-        if (!isset($errorList[$name])) {
+        if ($this->form->isValid()) {
             return null;
         }
 
-        return $errorList[$name];
+        return $this->form
+            ->getValidationErrors()
+            ->get($this->getOption('name'));
     }
 }
