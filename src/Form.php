@@ -331,27 +331,23 @@ class Form implements \IteratorAggregate
         } else {
             $methodAttribute = $method;
         }
-        $attributes = array_merge(
-            $attributes,
-            array(
+        $attributes = new AttributeSet($attributes);
+        $attributes->addMultiple(
+        array(
                 'action' => $this->getOption('action'),
                 'method' => $methodAttribute
             )
         );
         if ($this->getOption('validate_for') === false) {
-            $attributes['novalidate'] = 'novalidate';
+            $attributes->add('novalidate', 'novalidate');
         }
 
         return $attributes;
     }
 
-    private function getFormOpeningTag(array $attributes, $method)
+    private function getFormOpeningTag(AttributeSet $attributes, $method)
     {
-        $output = '<form';
-        foreach ($attributes as $name => $value) {
-            $output .= " {$name}=\"{$value}\"";
-        }
-        $output .= '>';
+        $output = "<form{$attributes}>";
         if ($method !== 'GET' && $method !== 'POST') {
             $output .= '<input type="hidden" name="_method" value="' . $method . '" />';
         }

@@ -131,7 +131,10 @@ class FormExtension extends Extension
             }
         }
 
-        $options['attributes'] = $attributes;
+        $options['attributes'] = new AttributeSet($attributes);
+        if (isset($options['label_attributes'])) {
+            $options['attributes'] = new AttributeSet($options['label_attributes']);
+        }
 
         $form = $this->formService->getFormBuilder(array())
             ->set('action', $url)
