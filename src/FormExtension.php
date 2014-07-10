@@ -32,86 +32,19 @@ class FormExtension extends Extension
     public function getFunctions()
     {
         $safe = array('is_safe' => 'html');
+        $ns = __NAMESPACE__;
 
         return array(
             new TemplateFunction('button', array($this, 'button'), $safe),
-            new TemplateFunction('form', array($this, 'form'), $safe),
-            new TemplateFunction('form_begin', array($this, 'begin'), $safe),
-            new TemplateFunction('form_end', array($this, 'end'), $safe),
-            new TemplateFunction('form_row', array($this, 'row'), $safe),
-            new TemplateFunction('form_label', array($this, 'label'), $safe),
-            new TemplateFunction('form_widget', array($this, 'widget'), $safe),
-            new TemplateFunction('form_error', array($this, 'error'), $safe),
-            new TemplateFunction('form_errors', array($this, 'errors'), $safe),
+            new TemplateFunction('form', $ns . '\\extension_function_form', $safe),
+            new TemplateFunction('form_begin', $ns . '\\extension_function_begin', $safe),
+            new TemplateFunction('form_end', $ns . '\\extension_function_end', $safe),
+            new TemplateFunction('form_row', $ns . '\\extension_function_row', $safe),
+            new TemplateFunction('form_label', $ns . '\\extension_function_label', $safe),
+            new TemplateFunction('form_widget', $ns . '\\extension_function_widget', $safe),
+            new TemplateFunction('form_error', $ns . '\\extension_function_error', $safe),
+            new TemplateFunction('form_errors', $ns . '\\extension_function_errors', $safe),
         );
-    }
-
-    public function form(Form $form, array $attributes = array(), $scenario = null)
-    {
-        $output = $this->begin($form, $attributes, $scenario);
-        foreach ($form as $element) {
-            $output .= $this->row($element);
-        }
-
-        return $output . $this->end($form);
-    }
-
-    public function begin(Form $form, array $attributes = array(), $scenario = null)
-    {
-        return $form->begin($attributes, $scenario);
-    }
-
-    public function end(Form $form)
-    {
-        return $form->end();
-    }
-
-    public function error(AbstractFormElement $element, array $attributes = array())
-    {
-        if ($element->getErrors() === null) {
-            return '';
-        }
-        $attributeList = AttributeSet::getAttributeString($attributes);
-
-        $output = "<ul{$attributeList}>";
-        foreach ($element->getErrors() as $error) {
-            $output .= "<li>{$error}</li>";
-        }
-
-        return $output . '</ul>';
-    }
-
-    public function errors(Form $form, array $attributes = array())
-    {
-        if ($form->isValid()) {
-            return '';
-        }
-        $attributeList = AttributeSet::getAttributeString($attributes);
-
-        $output = "<ul{$attributeList}>";
-        foreach ($form as $element) {
-            $output .= "<li>{$element->getOption('label')}: {$this->error($element)}</li>";
-        }
-
-        return $output . '</ul>';
-    }
-
-    public function label(AbstractFormElement $element, array $attributes = array())
-    {
-        return $element->label(new AttributeSet($attributes));
-    }
-
-    public function widget(AbstractFormElement $element, array $attributes = array())
-    {
-        return $element->widget(new AttributeSet($attributes));
-    }
-
-    public function row(AbstractFormElement $element, array $attributes = array())
-    {
-        $attributeList = AttributeSet::getAttributeString($attributes);
-
-        return "<div{$attributeList}>{$this->label($element)}" .
-        "{$this->error($element)}{$this->widget($element)}</div>";
     }
 
     public function button($url, $method, array $attributes = array())
@@ -142,6 +75,77 @@ class FormExtension extends Extension
             ->add('submit', 'submit', $options)
             ->getForm();
 
-        return $this->form($form, $formAttributes);
+        return extension_function_form($form, $formAttributes);
     }
+}
+
+function extension_function_form(Form $form, array $attributes = array(), $scenario = null)
+{
+    $output = extension_function_begin($form, $attributes, $scenario);
+    foreach ($form as $element) {
+        $output .= extension_function_row($element);
+    }
+
+    return $output . extension_function_end($form);
+}
+
+function extension_function_begin(Form $form, array $attributes = array(), $scenario = null)
+{
+    return $form->begin($attributes, $scenario);
+}
+
+function extension_function_end(Form $form)
+{
+    return $form->end();
+}
+
+function extension_function_error(AbstractFormElement $element, array $attributes = array())
+{
+    if ($element->getErrors() === null) {
+        return '';
+    }
+    $attributeList = AttributeSet::getAttributeString($attributes);
+
+    $output = "<ul{$attributeList}>";
+    foreach ($element->getErrors() as $error) {
+        $output .= "<li>{$error}</li>";
+    }
+
+    return $output . '</ul>';
+}
+
+function extension_function_errors(Form $form, array $attributes = array())
+{
+    if ($form->isValid()) {
+        return '';
+    }
+    $attributeList = AttributeSet::getAttributeString($attributes);
+
+    $output = "<ul{$attributeList}>";
+    foreach ($form as $element) {
+        $output .= "<li>{$element->getOption('label')}: {$this->error($element)}</li>";
+    }
+
+    return $output . '</ul>';
+}
+
+function extension_function_label(AbstractFormElement $element, array $attributes = array())
+{
+    return $element->label(new AttributeSet($attributes));
+}
+
+function extension_function_widget(AbstractFormElement $element, array $attributes = array())
+{
+    return $element->widget(new AttributeSet($attributes));
+}
+
+function extension_function_row(AbstractFormElement $element, array $attributes = array())
+{
+    $attributeList = AttributeSet::getAttributeString($attributes);
+
+    $label  = extension_function_label($element);
+    $error  = extension_function_error($element);
+    $widget = extension_function_widget($element);
+
+    return "<div{$attributeList}>{$label}{$error}{$widget}</div>";
 }
