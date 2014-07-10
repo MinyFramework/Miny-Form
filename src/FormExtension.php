@@ -123,10 +123,20 @@ class FormExtension extends Extension
             $formAttributes = array();
         }
 
+        $options = array();
+        foreach (array('widget', 'label') as $copied) {
+            if (isset($attributes[$copied])) {
+                $options[$copied] = $attributes[$copied];
+                unset($attributes[$copied]);
+            }
+        }
+
+        $options['attributes'] = $attributes;
+
         $form = $this->formService->getFormBuilder(array())
             ->set('action', $url)
             ->set('method', $method)
-            ->add('submit', 'submit', array('attributes' => $attributes))
+            ->add('submit', 'submit', $options)
             ->getForm();
 
         return $this->form($form, $formAttributes);
