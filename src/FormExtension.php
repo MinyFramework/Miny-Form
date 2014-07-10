@@ -37,7 +37,7 @@ class FormExtension extends Extension
 
         return array(
             new TemplateFunction('button', array($this, 'button'), $safe),
-            new TemplateFunction('form', array($this, 'render'), $safe),
+            new TemplateFunction('form', array($this, 'form'), $safe),
             new TemplateFunction('form_begin', array($this, 'begin'), $safe),
             new TemplateFunction('form_end', array($this, 'end'), $safe),
             new TemplateFunction('form_row', array($this, 'row'), $safe),
