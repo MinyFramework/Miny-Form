@@ -33,11 +33,18 @@ abstract class AbstractFormElement
         $attributes       = $this->getOption('attributes');
         $attributes['id'] = $attributes['name'] = $this->getOption('name');
         $this->setOption('attributes', $attributes);
-        $defaultData = $this->getOption('data');
-        if ($defaultData === null) {
-            $defaultData = $this->getOption('empty_data');
+        $this->setModelValue(
+            $this->getDefaultData()
+        );
+    }
+
+    private function getDefaultData()
+    {
+        if (isset($this->options['data'])) {
+            return $this->options['data'];
         }
-        $this->setModelValue($defaultData);
+
+        return $this->options['empty_data'];
     }
 
     public function getOption($key)

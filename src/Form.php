@@ -50,22 +50,15 @@ class Form implements \IteratorAggregate
     /**
      * @var array
      */
-    private $options = array(
-        'default' => array(
-            'action'          => '?',
-            'method'          => 'POST',
-            'csrf_protection' => true,
-            'csrf_field'      => '_token',
-            'validate_for'    => null
-        )
-    );
+    private $options = array();
     private $currentValidationScenario;
 
     public function __construct($data, Session $session, ValidatorService $validator)
     {
-        $this->data = $data;
-        $this->validator = $validator;
-        $this->session   = $session;
+        $this->data               = $data;
+        $this->validator          = $validator;
+        $this->session            = $session;
+        $this->options['default'] = $this->getDefaultOptionsArray();
     }
 
     public function setCurrentScenario($scenario)
@@ -78,13 +71,7 @@ class Form implements \IteratorAggregate
         $scenario = $scenario ? : $this->currentScenario;
 
         $this->options[$scenario] = array_merge(
-            array(
-                'action'          => '?',
-                'method'          => 'POST',
-                'csrf_protection' => true,
-                'csrf_field'      => '_token',
-                'validate_for'    => null
-            ),
+            $this->getDefaultOptionsArray(),
             $options
         );
     }
@@ -93,14 +80,20 @@ class Form implements \IteratorAggregate
     {
         $scenario = $scenario ? : $this->currentScenario;
         if (!isset($this->options[$scenario])) {
-            $this->options[$scenario] = array(
-                'action'          => '?',
-                'method'          => 'POST',
-                'csrf_protection' => true,
-                'validate_for'    => null
-            );
+            $this->options[$scenario] = $this->getDefaultOptionsArray();
         }
         $this->options[$scenario][$key] = $value;
+    }
+
+    private function getDefaultOptionsArray()
+    {
+        return array(
+            'action'          => '?',
+            'method'          => 'POST',
+            'csrf_protection' => true,
+            'csrf_field'      => '_token',
+            'validate_for'    => null
+        );
     }
 
     public function hasOption($key, $scenario = null)
@@ -146,10 +139,8 @@ class Form implements \IteratorAggregate
         } else {
             $container = $request->post();
         }
-        if ($this->getOption('csrf_protection', $scenario)) {
-            if (!$this->csrfTokenPresent($container, $scenario)) {
-                return false;
-            }
+        if (!$this->csrfTokenPresent($container, $scenario)) {
+            return false;
         }
 
         //fill $this->object
@@ -274,6 +265,10 @@ class Form implements \IteratorAggregate
 
     private function csrfTokenPresent(ParameterContainer $container, $scenario)
     {
+        if (!$this->getOption('csrf_protection', $scenario)) {
+            return true;
+        }
+
         if (!isset($this->session->csrf_token)) {
             return false;
         }
@@ -311,7 +306,26 @@ class Form implements \IteratorAggregate
     public function begin(array $attributes = array(), $scenario = null)
     {
         $this->setCurrentScenario($scenario);
-        $method = $this->getOption('method');
+        $method     = $this->getOption('method');
+        $attributes = $this->getFormAttributes($attributes, $method);
+        $output     = $this->getFormOpeningTag($attributes, $method);
+        if ($this->getOption('csrf_protection', $this->currentScenario)) {
+            if (!isset($this->session->has_csrf_token)) {
+                $this->session->flash('has_csrf_token', true, 0);
+                $this->session->csrf_token = sha1(mt_rand() . microtime());
+            }
+            $output .= sprintf(
+                '<input type="hidden" name="%s" value="%s">',
+                $this->getOption('csrf_field'),
+                $this->session->csrf_token
+            );
+        }
+
+        return $output;
+    }
+
+    private function getFormAttributes(array $attributes, $method)
+    {
         if ($method !== 'GET' && $method !== 'POST') {
             $methodAttribute = 'POST';
         } else {
@@ -327,6 +341,12 @@ class Form implements \IteratorAggregate
         if ($this->getOption('validate_for') === false) {
             $attributes['novalidate'] = 'novalidate';
         }
+
+        return $attributes;
+    }
+
+    private function getFormOpeningTag(array $attributes, $method)
+    {
         $output = '<form';
         foreach ($attributes as $name => $value) {
             $output .= " {$name}=\"{$value}\"";
@@ -334,17 +354,6 @@ class Form implements \IteratorAggregate
         $output .= '>';
         if ($method !== 'GET' && $method !== 'POST') {
             $output .= '<input type="hidden" name="_method" value="' . $method . '" />';
-        }
-        if ($this->getOption('csrf_protection', $this->currentScenario)) {
-            if (!isset($this->session->has_csrf_token)) {
-                $this->session->flash('has_csrf_token', true, 0);
-                $this->session->csrf_token = sha1(mt_rand() . microtime());
-            }
-            $output .= sprintf(
-                '<input type="hidden" name="%s" value="%s">',
-                $this->getOption('csrf_field'),
-                $this->session->csrf_token
-            );
         }
 
         return $output;

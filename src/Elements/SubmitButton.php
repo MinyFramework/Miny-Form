@@ -15,11 +15,31 @@ class SubmitButton extends Button
     {
         $options = parent::getDefaultOptions();
 
-        $options['validate_for']       = null;
-        $options['attributes']['type'] = 'submit';
+        $options['validate_for'] = null;
+        $options['widget']       = 'button';
 
         return $options;
     }
+
+    protected function render(array $attributes)
+    {
+        $widget = $this->getOption('widget');
+        switch ($widget) {
+            case 'button':
+                $attributes['type'] = 'submit';
+
+                return parent::render($attributes);
+            case 'image':
+                $attributes['type'] = 'image';
+                $attributes['src']  = $this->getOption('label');
+
+                return sprintf('<input%s />', $this->attributes($attributes));
+
+            default:
+                throw new \InvalidArgumentException("Invalid submit button widget: {$widget}");
+        }
+    }
+
 
     public function toModelValue($viewValue)
     {
