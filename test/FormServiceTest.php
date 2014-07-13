@@ -2,6 +2,7 @@
 
 namespace Modules\Form;
 
+use Miny\Event\EventDispatcher;
 use Miny\HTTP\Request;
 use Miny\HTTP\Session;
 use Modules\Validator\Rules\Blank;
@@ -24,7 +25,7 @@ class FormServiceTest extends \PHPUnit_Framework_TestCase
     {
         $tokenProvider = new CsrfTokenProvider(new Session(false));
 
-        $this->validator   = new ValidatorService();
+        $this->validator = new ValidatorService(new EventDispatcher());
         $this->formService = new FormService($tokenProvider, $this->validator);
     }
 

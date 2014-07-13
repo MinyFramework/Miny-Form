@@ -2,6 +2,7 @@
 
 namespace Modules\Form\Elements;
 
+use Miny\Event\EventDispatcher;
 use Miny\HTTP\Session;
 use Modules\Form\CsrfTokenProvider;
 use Modules\Form\Form;
@@ -29,7 +30,7 @@ class ResetTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $tokenProvider     = new CsrfTokenProvider(new Session(false));
-        $this->validator   = new ValidatorService();
+        $this->validator = new ValidatorService(new EventDispatcher());
         $this->formService = new FormService($tokenProvider, $this->validator);
 
         $this->object = new \stdClass();
