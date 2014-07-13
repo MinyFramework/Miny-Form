@@ -43,6 +43,18 @@ class AttributeSet
         $this->attributes[$attribute] = $value;
     }
 
+    public function remove($attribute)
+    {
+        if (isset($this->attributes[$attribute])) {
+            $value = $this->attributes[$attribute];
+            unset($this->attributes[$attribute]);
+
+            return $value;
+        }
+
+        return null;
+    }
+
     public function append($attribute, $value)
     {
         if (!$this->has($attribute)) {

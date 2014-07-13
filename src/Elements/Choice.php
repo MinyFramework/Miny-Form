@@ -84,9 +84,12 @@ class Choice extends AbstractFormElement
 
     public function widget(AttributeSet $attributes = null)
     {
-        if (isset($attributes['separator'])) {
-            $this->setOption('separator', $attributes['separator']);
-            unset($attributes['separator']);
+        if (!$attributes) {
+            $attributes = new AttributeSet();
+        }
+        $separator = $attributes->remove('separator');
+        if ($separator !== null) {
+            $this->setOption('separator', $separator);
         }
 
         return parent::widget($attributes);
