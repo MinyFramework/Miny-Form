@@ -9,15 +9,14 @@
 
 namespace Modules\Form;
 
-use Miny\HTTP\Session;
 use Modules\Validator\ValidatorService;
 
 class FormService
 {
     /**
-     * @var Session
+     * @var CsrfTokenProvider
      */
-    private $session;
+    private $tokenProvider;
 
     /**
      * @var ValidatorService
@@ -39,10 +38,10 @@ class FormService
         'textarea' => 'Modules\\Form\\Elements\\Textarea',
     );
 
-    public function __construct(Session $session, ValidatorService $validator)
+    public function __construct(CsrfTokenProvider $tokenProvider, ValidatorService $validator)
     {
-        $this->session   = $session;
-        $this->validator = $validator;
+        $this->tokenProvider = $tokenProvider;
+        $this->validator     = $validator;
     }
 
     public function registerElement($name, $class)
@@ -51,7 +50,7 @@ class FormService
     }
 
     /**
-     * @param Form $form
+     * @param Form   $form
      * @param string $name
      * @param array  $options
      *
@@ -99,11 +98,11 @@ class FormService
     }
 
     /**
-     * @return Session
+     * @return CsrfTokenProvider
      */
-    public function getSession()
+    public function getCsrfTokenProvider()
     {
-        return $this->session;
+        return $this->tokenProvider;
     }
 
     /**

@@ -4,6 +4,7 @@ namespace Modules\Form\Elements;
 
 use Miny\HTTP\Request;
 use Miny\HTTP\Session;
+use Modules\Form\CsrfTokenProvider;
 use Modules\Form\Form;
 use Modules\Form\FormService;
 use Modules\Validator\ValidatorService;
@@ -28,9 +29,9 @@ class CheckBoxTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $session           = new Session(false);
+        $tokenProvider     = new CsrfTokenProvider(new Session(false));
         $this->validator   = new ValidatorService();
-        $this->formService = new FormService($session, $this->validator);
+        $this->formService = new FormService($tokenProvider, $this->validator);
 
         $this->object = (object)array('someProperty' => null);
         $this->form   = $this->formService

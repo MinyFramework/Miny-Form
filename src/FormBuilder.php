@@ -25,7 +25,10 @@ class FormBuilder
     {
         $this->formService = $formService;
 
-        $this->form = new Form($object, $formService->getSession(), $formService->getValidator());
+        $this->form = new Form($object,
+            $formService->getCsrfTokenProvider(),
+            $formService->getValidator()
+        );
     }
 
     public function get($option, $scenario = null)

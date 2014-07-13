@@ -11,7 +11,6 @@ namespace Modules\Form;
 
 use Miny\HTTP\ParameterContainer;
 use Miny\HTTP\Request;
-use Miny\HTTP\Session;
 use Modules\Validator\ErrorList;
 use Modules\Validator\ValidatorService;
 
@@ -28,9 +27,9 @@ class Form implements \IteratorAggregate
     private $validator;
 
     /**
-     * @var Session
+     * @var CsrfTokenProvider
      */
-    private $session;
+    private $tokenProvider;
 
     /**
      * @var ErrorList|bool
@@ -53,11 +52,14 @@ class Form implements \IteratorAggregate
     private $options = array();
     private $currentValidationScenario;
 
-    public function __construct($data, Session $session, ValidatorService $validator)
-    {
+    public function __construct(
+        $data,
+        CsrfTokenProvider $tokenProvider,
+        ValidatorService $validator
+    ) {
         $this->data               = $data;
         $this->validator          = $validator;
-        $this->session            = $session;
+        $this->tokenProvider      = $tokenProvider;
         $this->options['default'] = $this->getDefaultOptionsArray();
     }
 
@@ -273,16 +275,12 @@ class Form implements \IteratorAggregate
             return true;
         }
 
-        if (!isset($this->session->csrf_token)) {
-            return false;
-        }
-
         $fieldName = $this->getOption('csrf_field', $scenario);
         if (!$container->has($fieldName)) {
             return false;
         }
 
-        return $container->get($fieldName) === $this->session->csrf_token;
+        return $this->tokenProvider->matchToken($container->get($fieldName));
     }
 
     /**
@@ -316,14 +314,10 @@ class Form implements \IteratorAggregate
         $attributes = $this->getFormAttributes($attributes, $method);
         $output     = $this->getFormOpeningTag($attributes, $method);
         if ($this->getOption('csrf_protection', $this->currentScenario)) {
-            if (!isset($this->session->has_csrf_token)) {
-                $this->session->flash('has_csrf_token', true, 0);
-                $this->session->csrf_token = sha1(mt_rand() . microtime());
-            }
             $output .= sprintf(
                 '<input type="hidden" name="%s" value="%s">',
                 $this->getOption('csrf_field'),
-                $this->session->csrf_token
+                $this->tokenProvider->generateToken()
             );
         }
 

@@ -22,10 +22,10 @@ class FormServiceTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $session = new Session(false);
+        $tokenProvider = new CsrfTokenProvider(new Session(false));
 
         $this->validator   = new ValidatorService();
-        $this->formService = new FormService($session, $this->validator);
+        $this->formService = new FormService($tokenProvider, $this->validator);
     }
 
     public function testNotSubmittedFormIsNotValid()
