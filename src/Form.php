@@ -53,6 +53,8 @@ class Form implements \IteratorAggregate
     private $options = array();
     private $currentValidationScenario;
     private $notRenderedFields = array();
+    private $onFailureCallback;
+    private $onSuccessCallback;
 
     public function __construct(
         $data,
@@ -146,6 +148,8 @@ class Form implements \IteratorAggregate
             $container = $request->post();
         }
         if (!$this->csrfTokenPresent($container, $this->currentScenario)) {
+            $this->failure();
+
             return false;
         }
 
@@ -180,12 +184,14 @@ class Form implements \IteratorAggregate
         if ($this->currentValidationScenario !== false) {
             if (!$this->validator->validate($this->data, $this->currentValidationScenario)) {
                 $this->validationErrors = $this->validator->getErrors();
+                $this->failure();
 
                 return false;
             }
         }
 
         $this->validationErrors = null;
+        $this->success();
 
         return true;
     }
@@ -385,5 +391,35 @@ class Form implements \IteratorAggregate
     public function markRendered($field)
     {
         unset($this->notRenderedFields[$field]);
+    }
+
+    public function onSuccess($callback)
+    {
+        if (!is_callable($callback)) {
+            throw new \InvalidArgumentException('$callback needs to be callable');
+        }
+        $this->onSuccessCallback = $callback;
+    }
+
+    public function onFailure($callback)
+    {
+        if (!is_callable($callback)) {
+            throw new \InvalidArgumentException('$callback needs to be callable');
+        }
+        $this->onFailureCallback = $callback;
+    }
+
+    private function success()
+    {
+        if (isset($this->onSuccessCallback)) {
+            call_user_func($this->onSuccessCallback, $this);
+        }
+    }
+
+    private function failure()
+    {
+        if (isset($this->onFailureCallback)) {
+            call_user_func($this->onFailureCallback, $this);
+        }
     }
 }
