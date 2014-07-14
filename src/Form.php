@@ -11,6 +11,7 @@ namespace Modules\Form;
 
 use Miny\HTTP\ParameterContainer;
 use Miny\HTTP\Request;
+use Modules\Form\Elements\Hidden;
 use Modules\Validator\ErrorList;
 use Modules\Validator\ValidatorService;
 
@@ -39,7 +40,7 @@ class Form implements \IteratorAggregate
     /**
      * @var AbstractFormElement[]
      */
-    private $elements = array();
+    private $fields = array();
 
     /**
      * @var string
@@ -51,6 +52,7 @@ class Form implements \IteratorAggregate
      */
     private $options = array();
     private $currentValidationScenario;
+    private $notRenderedFields = array();
 
     public function __construct(
         $data,
@@ -118,7 +120,7 @@ class Form implements \IteratorAggregate
     public function add($property, AbstractFormElement $element)
     {
         $element->setOption('name', $property);
-        $this->elements[$property] = $element;
+        $this->fields[$property] = $element;
     }
 
     /**
@@ -148,7 +150,7 @@ class Form implements \IteratorAggregate
         }
 
         //fill $this->object
-        foreach ($this->elements as $property => $element) {
+        foreach ($this->fields as $property => $element) {
             if ($container->has($property)) {
                 $element->setViewValue($container->get($property));
             }
@@ -254,11 +256,11 @@ class Form implements \IteratorAggregate
 
     public function get($property)
     {
-        if (!isset($this->elements[$property])) {
+        if (!isset($this->fields[$property])) {
             throw new \OutOfBoundsException("Form element {$property} is not set");
         }
 
-        return $this->elements[$property];
+        return $this->fields[$property];
     }
 
     /**
@@ -288,7 +290,7 @@ class Form implements \IteratorAggregate
      */
     public function initialize()
     {
-        foreach ($this->elements as $element) {
+        foreach ($this->fields as $element) {
             $element->initialize();
         }
         $this->synchronize();
@@ -297,67 +299,12 @@ class Form implements \IteratorAggregate
     private function synchronize()
     {
         //pass values to elements
-        foreach ($this->elements as $property => $element) {
+        foreach ($this->fields as $property => $element) {
             $value = $this->getProperty($property);
             if ($value !== null) {
                 $element->setModelValue($value);
             }
         }
-    }
-
-    public function begin(array $attributes = array(), $scenario = null)
-    {
-        if ($scenario !== null) {
-            $this->currentScenario = $scenario;
-        }
-        $method     = $this->getOption('method');
-        $attributes = $this->getFormAttributes($attributes, $method);
-        $output     = $this->getFormOpeningTag($attributes, $method);
-        if ($this->getOption('csrf_protection', $this->currentScenario)) {
-            $output .= sprintf(
-                '<input type="hidden" name="%s" value="%s">',
-                $this->getOption('csrf_field'),
-                $this->tokenProvider->generateToken()
-            );
-        }
-
-        return $output;
-    }
-
-    private function getFormAttributes(array $attributes, $method)
-    {
-        if ($method !== 'GET' && $method !== 'POST') {
-            $methodAttribute = 'POST';
-        } else {
-            $methodAttribute = $method;
-        }
-        $attributes = new AttributeSet($attributes);
-        $attributes->addMultiple(
-            array(
-                'action' => $this->getOption('action'),
-                'method' => $methodAttribute
-            )
-        );
-        if ($this->getOption('validate_for') === false) {
-            $attributes->add('novalidate', 'novalidate');
-        }
-
-        return $attributes;
-    }
-
-    private function getFormOpeningTag(AttributeSet $attributes, $method)
-    {
-        $output = "<form{$attributes}>";
-        if ($method !== 'GET' && $method !== 'POST') {
-            $output .= '<input type="hidden" name="_method" value="' . $method . '" />';
-        }
-
-        return $output;
-    }
-
-    public function end()
-    {
-        return '</form>';
     }
 
     /**
@@ -367,6 +314,76 @@ class Form implements \IteratorAggregate
     {
         $this->synchronize();
 
-        return new \ArrayIterator($this->elements);
+        return new \ArrayIterator($this->fields);
+    }
+
+    public function begin(array $attributes = array(), $scenario = null)
+    {
+        if ($scenario !== null) {
+            $this->currentScenario = $scenario;
+        }
+        $method = $this->getOption('method');
+        $output = $this->getFormOpeningTag(
+            $this->getFormAttributes($attributes, $method)
+        );
+
+        $this->addMethodEmulationField($method);
+        $this->addCsrfTokenField();
+
+        $this->notRenderedFields = array_flip(array_keys($this->fields));
+
+        return $output;
+    }
+
+    private function getFormAttributes(array $attributes, $method)
+    {
+        $attributes = new AttributeSet($attributes);
+        $attributes->add('action', $this->getOption('action'));
+        $attributes->add('method', $method !== 'GET' ? 'POST' : $method);
+
+        if ($this->getOption('validate_for') === false) {
+            $attributes->add('novalidate', 'novalidate');
+        }
+
+        return $attributes;
+    }
+
+    private function addCsrfTokenField()
+    {
+        if ($this->getOption('csrf_protection', $this->currentScenario)) {
+            $csrfField = new Hidden($this, array());
+            $csrfField->setModelValue($this->tokenProvider->generateToken());
+
+            $this->add($this->getOption('csrf_field'), $csrfField);
+        }
+    }
+
+    private function addMethodEmulationField($method)
+    {
+        if ($method !== 'GET' && $method !== 'POST') {
+            $methodField = new Hidden($this, array());
+            $methodField->setModelValue($method);
+
+            $this->add('method', $methodField);
+        }
+    }
+
+    private function getFormOpeningTag(AttributeSet $attributes)
+    {
+        return "<form{$attributes}>";
+    }
+
+    public function end()
+    {
+        foreach ($this->notRenderedFields as $field) {
+            $this->get($field)->row();
+        }
+
+        return '</form>';
+    }
+
+    public function markRendered($field)
+    {
+        unset($this->notRenderedFields[$field]);
     }
 }

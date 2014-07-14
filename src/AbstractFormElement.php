@@ -76,46 +76,6 @@ abstract class AbstractFormElement
         );
     }
 
-    public function attributes(array $attributes)
-    {
-        return AttributeSet::getAttributeString($attributes);
-    }
-
-    public function label(AttributeSet $attributes = null)
-    {
-        if (!$attributes) {
-            $attributes = new AttributeSet();
-        }
-        $attributes->addMultiple($this->getOption('label_attributes'));
-
-        $defaultAttributes = $this->getOption('attributes');
-        $idAttribute = $defaultAttributes->get('id');
-
-        $attributes->add('id', 'label_' . $idAttribute);
-        $attributes->add('for', $idAttribute);
-
-        return "<label{$attributes}>{$this->getOption('label')}</label>";
-    }
-
-    public function widget(AttributeSet $attributes = null)
-    {
-        if (!$attributes) {
-            $attributes = new AttributeSet();
-        }
-        $attributes->addMultiple($this->getOption('attributes'));
-
-        if ($this->getOption('required')) {
-            $attributes->add('required', 'required');
-        }
-        if ($this->getOption('disabled')) {
-            $attributes->add('disabled', 'disabled');
-        }
-
-        return $this->render($attributes);
-    }
-
-    abstract protected function render(AttributeSet $attributes);
-
     public function setViewValue($value)
     {
         $this->viewValue  = $value;
@@ -159,5 +119,76 @@ abstract class AbstractFormElement
         return $this->form
             ->getValidationErrors()
             ->get($this->getOption('name'));
+    }
+
+    public function label(AttributeSet $attributes = null)
+    {
+        if (!$attributes) {
+            $attributes = new AttributeSet();
+        }
+        $attributes->addMultiple($this->getOption('label_attributes'));
+
+        $idAttribute = $this->getOption('attributes')->get('id');
+
+        $attributes->add('id', 'label_' . $idAttribute);
+        $attributes->add('for', $idAttribute);
+
+        return "<label{$attributes}>{$this->getOption('label')}</label>";
+    }
+
+    public function widget(AttributeSet $attributes = null)
+    {
+        if (!$attributes) {
+            $attributes = new AttributeSet();
+        }
+        $attributes->addMultiple($this->getOption('attributes'));
+
+        if ($this->getOption('required')) {
+            $attributes->add('required', 'required');
+        }
+        if ($this->getOption('disabled')) {
+            $attributes->add('disabled', 'disabled');
+        }
+
+        $this->form->markRendered($this->getOption('name'));
+
+        return $this->render($attributes);
+    }
+
+    abstract protected function render(AttributeSet $attributes);
+
+    public function row(AttributeSet $attributes = null)
+    {
+        if (!$attributes) {
+            $attributes = new AttributeSet();
+        }
+
+        $labelAttributes  = $attributes->remove('label') ? : array();
+        $errorAttributes  = $attributes->remove('error') ? : array();
+        $widgetAttributes = $attributes->remove('widget') ? : array();
+
+        $label  = $this->label($this, new AttributeSet($labelAttributes));
+        $error  = $this->error($this, new AttributeSet($errorAttributes));
+        $widget = $this->widget($this, new AttributeSet($widgetAttributes));
+
+        return "<div{$attributes}>{$label}{$error}{$widget}</div>";
+    }
+
+    public function error(AttributeSet $attributes = null)
+    {
+        if ($this->getErrors() === null) {
+            return '';
+        }
+
+        if (!$attributes) {
+            $attributes = new AttributeSet();
+        }
+
+        $output = "<ul{$attributes}>";
+        foreach ($this->getErrors() as $error) {
+            $output .= "<li>{$error}</li>";
+        }
+
+        return $output . '</ul>';
     }
 }

@@ -81,12 +81,7 @@ class FormExtension extends Extension
 
 function extension_function_form(Form $form, array $attributes = array(), $scenario = null)
 {
-    $output = extension_function_begin($form, $attributes, $scenario);
-    foreach ($form as $element) {
-        $output .= extension_function_row($element);
-    }
-
-    return $output . extension_function_end($form);
+    return $form->begin($attributes, $scenario) . $form->end();
 }
 
 function extension_function_begin(Form $form, array $attributes = array(), $scenario = null)
@@ -101,17 +96,7 @@ function extension_function_end(Form $form)
 
 function extension_function_error(AbstractFormElement $element, array $attributes = array())
 {
-    if ($element->getErrors() === null) {
-        return '';
-    }
-    $attributeList = AttributeSet::getAttributeString($attributes);
-
-    $output = "<ul{$attributeList}>";
-    foreach ($element->getErrors() as $error) {
-        $output .= "<li>{$error}</li>";
-    }
-
-    return $output . '</ul>';
+    return $element->error(new AttributeSet($attributes));
 }
 
 function extension_function_errors(Form $form, array $attributes = array())
@@ -141,15 +126,5 @@ function extension_function_widget(AbstractFormElement $element, array $attribut
 
 function extension_function_row(AbstractFormElement $element, array $attributes = array())
 {
-    $attributeList = new AttributeSet($attributes);
-
-    $labelAttributes  = $attributeList->remove('label') ? : array();
-    $errorAttributes  = $attributeList->remove('error') ? : array();
-    $widgetAttributes = $attributeList->remove('widget') ? : array();
-
-    $label  = extension_function_label($element, $labelAttributes);
-    $error  = extension_function_error($element, $errorAttributes);
-    $widget = extension_function_widget($element, $widgetAttributes);
-
-    return "<div{$attributeList}>{$label}{$error}{$widget}</div>";
+    return $element->row(new AttributeSet($attributes));
 }
