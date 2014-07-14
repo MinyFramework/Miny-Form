@@ -31,6 +31,7 @@ class FormService
         'checkbox' => 'Modules\\Form\\Elements\\CheckBox',
         'choice'   => 'Modules\\Form\\Elements\\Choice',
         'date'     => 'Modules\\Form\\Elements\\Date',
+        'hidden' => 'Modules\\Form\\Elements\\Hidden',
         'password' => 'Modules\\Form\\Elements\\Password',
         'reset'    => 'Modules\\Form\\Elements\\ResetButton',
         'submit'   => 'Modules\\Form\\Elements\\SubmitButton',
