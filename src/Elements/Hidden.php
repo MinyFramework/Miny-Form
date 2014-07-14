@@ -18,6 +18,11 @@ class Hidden extends AbstractFormElement
     {
     }
 
+    public function row(AttributeSet $attributes = null)
+    {
+        return $this->widget($attributes);
+    }
+
     protected function render(AttributeSet $attributes)
     {
         $viewValue = $this->getViewValue();

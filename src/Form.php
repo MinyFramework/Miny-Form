@@ -349,10 +349,10 @@ class Form implements \IteratorAggregate
     {
         if ($this->getOption('csrf_protection', $this->currentScenario)) {
             $csrfField = new Hidden($this, array());
-            $csrfField->setModelValue($this->tokenProvider->generateToken());
 
             $this->add($this->getOption('csrf_field'), $csrfField);
             $csrfField->initialize();
+            $csrfField->setModelValue($this->tokenProvider->generateToken());
         }
     }
 
@@ -360,10 +360,10 @@ class Form implements \IteratorAggregate
     {
         if ($method !== 'GET' && $method !== 'POST') {
             $methodField = new Hidden($this, array());
-            $methodField->setModelValue($method);
 
             $this->add('method', $methodField);
             $methodField->initialize();
+            $methodField->setModelValue($method);
         }
     }
 
