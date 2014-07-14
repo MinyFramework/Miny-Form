@@ -161,17 +161,26 @@ abstract class AbstractFormElement
     {
         if (!$attributes) {
             $attributes = new AttributeSet();
+        } elseif (($label = $attributes->remove('label')) !== null) {
+            $savedLabel = $this->getOption('label');
+            $this->setOption('label', $label);
         }
 
-        $labelAttributes  = $attributes->remove('label') ? : array();
-        $errorAttributes  = $attributes->remove('error') ? : array();
-        $widgetAttributes = $attributes->remove('widget') ? : array();
+        $labelAttributes = $attributes->remove('label_attributes') ? : array();
+        $errorAttributes = $attributes->remove('error_attributes') ? : array();
+        $rowAttributes   = AttributeSet::getAttributeString(
+            $attributes->remove('row_attributes') ? : array()
+        );
 
-        $label  = $this->label($this, new AttributeSet($labelAttributes));
-        $error  = $this->error($this, new AttributeSet($errorAttributes));
-        $widget = $this->widget($this, new AttributeSet($widgetAttributes));
+        $label  = $this->label(new AttributeSet($labelAttributes));
+        $error  = $this->error(new AttributeSet($errorAttributes));
+        $widget = $this->widget($attributes);
 
-        return "<div{$attributes}>{$label}{$error}{$widget}</div>";
+        if (isset($savedLabel)) {
+            $this->setOption('label', $savedLabel);
+        }
+
+        return "<div{$rowAttributes}>{$label}{$error}{$widget}</div>";
     }
 
     public function error(AttributeSet $attributes = null)

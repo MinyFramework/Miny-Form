@@ -285,9 +285,6 @@ class Form implements \IteratorAggregate
         return $this->tokenProvider->matchToken($container->get($fieldName));
     }
 
-    /**
-     * @return AbstractFormElement
-     */
     public function initialize()
     {
         foreach ($this->fields as $element) {
@@ -355,6 +352,7 @@ class Form implements \IteratorAggregate
             $csrfField->setModelValue($this->tokenProvider->generateToken());
 
             $this->add($this->getOption('csrf_field'), $csrfField);
+            $csrfField->initialize();
         }
     }
 
@@ -365,6 +363,7 @@ class Form implements \IteratorAggregate
             $methodField->setModelValue($method);
 
             $this->add('method', $methodField);
+            $methodField->initialize();
         }
     }
 
@@ -375,7 +374,7 @@ class Form implements \IteratorAggregate
 
     public function end()
     {
-        foreach ($this->notRenderedFields as $field) {
+        foreach ($this->notRenderedFields as $field => $key) {
             $this->get($field)->row();
         }
 
