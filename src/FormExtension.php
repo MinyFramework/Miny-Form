@@ -141,11 +141,15 @@ function extension_function_widget(AbstractFormElement $element, array $attribut
 
 function extension_function_row(AbstractFormElement $element, array $attributes = array())
 {
-    $attributeList = AttributeSet::getAttributeString($attributes);
+    $attributeList = new AttributeSet($attributes);
 
-    $label  = extension_function_label($element);
-    $error  = extension_function_error($element);
-    $widget = extension_function_widget($element);
+    $labelAttributes  = $attributeList->remove('label') ? : array();
+    $errorAttributes  = $attributeList->remove('error') ? : array();
+    $widgetAttributes = $attributeList->remove('widget') ? : array();
+
+    $label  = extension_function_label($element, $labelAttributes);
+    $error  = extension_function_error($element, $errorAttributes);
+    $widget = extension_function_widget($element, $widgetAttributes);
 
     return "<div{$attributeList}>{$label}{$error}{$widget}</div>";
 }
