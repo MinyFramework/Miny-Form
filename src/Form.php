@@ -374,11 +374,12 @@ class Form implements \IteratorAggregate
 
     public function end()
     {
+        $output = '';
         foreach ($this->notRenderedFields as $field => $key) {
-            $this->get($field)->row();
+            $output .= $this->get($field)->row();
         }
 
-        return '</form>';
+        return $output . '</form>';
     }
 
     public function markRendered($field)
