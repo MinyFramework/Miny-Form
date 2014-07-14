@@ -37,6 +37,7 @@ class FormService
         'submit'   => 'Modules\\Form\\Elements\\SubmitButton',
         'text'     => 'Modules\\Form\\Elements\\Text',
         'textarea' => 'Modules\\Form\\Elements\\Textarea',
+        'time'   => 'Modules\\Form\\Elements\\Time',
     );
 
     public function __construct(CsrfTokenProvider $tokenProvider, ValidatorService $validator)
