@@ -361,7 +361,7 @@ class Form implements \IteratorAggregate
         if ($method !== 'GET' && $method !== 'POST') {
             $methodField = new Hidden($this, array());
 
-            $this->add('method', $methodField);
+            $this->add('_method', $methodField);
             $methodField->initialize();
             $methodField->setModelValue($method);
         }
