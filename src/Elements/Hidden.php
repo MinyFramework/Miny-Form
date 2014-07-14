@@ -14,6 +14,10 @@ use Modules\Form\AttributeSet;
 
 class Hidden extends AbstractFormElement
 {
+    public function label(AttributeSet $attributes = null)
+    {
+    }
+
     protected function render(AttributeSet $attributes)
     {
         $viewValue = $this->getViewValue();
