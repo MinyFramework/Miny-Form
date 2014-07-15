@@ -9,15 +9,28 @@
 
 namespace Modules\Form\Elements;
 
+use Modules\Form\AbstractConverter;
 use Modules\Form\AbstractFormElement;
 use Modules\Form\AttributeSet;
+use Modules\Form\Converters\DateTimeToArrayConverter;
+use Modules\Form\Converters\DateTimeToStringConverter;
+use Modules\Form\Converters\DateTimeToTimestampConverter;
+use Modules\Form\Converters\NullConverter;
 
 class Time extends AbstractFormElement
 {
+    /**
+     * @var AbstractConverter
+     */
+    private $viewConverter;
+
+    /**
+     * @var AbstractConverter
+     */
+    private $modelConverter;
+
     protected function getDefaultOptions()
     {
-        $current = new \DateTime('now');
-
         $default = array(
             'widget'       => 'choice',
             'format'       => 'H:i:s',
@@ -33,76 +46,45 @@ class Time extends AbstractFormElement
         return array_merge(parent::getDefaultOptions(), $default);
     }
 
-    /**
-     * @param $value
-     *
-     * @throws \UnexpectedValueException
-     * @return \DateTime
-     */
-    private function convertViewToIntermediateData($value)
+    public function initialize()
     {
-        $widget = $this->getOption('widget');
+        $this->viewConverter  = $this->createViewConverter();
+        $this->modelConverter = $this->createModelConverter();
 
-        switch ($widget) {
-            case 'choice':
-                $hours   = $this->getOption('hours');
-                $minutes = $this->getOption('minutes');
-                $seconds = $this->getOption('seconds');
-
-                $hour   = $hours[$value['hour']];
-                $minute = $minutes[$value['minute']];
-                $second = $seconds[$value['second']];
-
-                $date = new \DateTime("{$hour}:{$minute}:{$second}");
-                break;
-
-            case 'textfields':
-                $date = new \DateTime("{$value['hour']}:{$value['minute']}:{$value['second']}");
-                break;
-
-            case 'single_textfield':
-                $date = \DateTime::createFromFormat($this->getOption('format'), $value);
-                break;
-
-            default:
-                throw new \UnexpectedValueException("Invalid date widget: {$widget}");
-        }
-
-        return $date;
+        parent::initialize();
     }
 
-    /**
-     * @param $value
-     *
-     * @throws \UnexpectedValueException
-     * @return \DateTime
-     */
-    private function convertModelToIntermediateData($value)
+    private function createModelConverter()
     {
         $type = $this->getOption('data_type');
-
         switch ($type) {
             case 'datetime':
-                return $value;
+                return new NullConverter();
 
             case 'string':
-                return \DateTime::createFromFormat($this->getOption('format'), $value);
+                return new DateTimeToStringConverter($this->getOption('format'));
 
             case 'timestamp':
-                $date = new \DateTime();
-                $date->setTimestamp($value);
-
-                return $date;
+                return new DateTimeToTimestampConverter();
 
             case 'array':
-                $date = new \DateTime();
-                $date->setTime($value['hour'], $value['minute'], $value['second']);
-
-                return $date;
-
-            default:
-                throw new \UnexpectedValueException("Invalid date type: {$type}");
+                return new DateTimeToArrayConverter(array('hour', 'minute', 'second'));
         }
+        throw new \UnexpectedValueException("Invalid date type: {$type}");
+    }
+
+    private function createViewConverter()
+    {
+        $widget = $this->getOption('widget');
+        switch ($widget) {
+            case 'choice':
+            case 'textfields':
+                return new DateTimeToArrayConverter(array('hour', 'minute', 'second'));
+
+            case 'single_textfield':
+                return new DateTimeToStringConverter($this->getOption('format'));
+        }
+        throw new \UnexpectedValueException("Invalid date widget: {$widget}");
     }
 
     protected function toModelValue($value)
@@ -110,24 +92,10 @@ class Time extends AbstractFormElement
         if ($value === null) {
             return $value;
         }
-        $dateTime = $this->convertViewToIntermediateData($value);
-        $type     = $this->getOption('data_type');
-        switch ($type) {
-            case 'datetime':
-                return $dateTime;
 
-            case 'timestamp':
-                return $dateTime->getTimestamp();
-
-            case 'array':
-                return $this->datetimeToArray($dateTime);
-
-            case 'string':
-                return $dateTime->format($this->getOption('format'));
-
-            default:
-                throw new \UnexpectedValueException("Invalid date type: {$type}");
-        }
+        return $this->modelConverter->convert(
+            $this->viewConverter->convertBack($value)
+        );
     }
 
     protected function toViewValue($value)
@@ -135,22 +103,10 @@ class Time extends AbstractFormElement
         if ($value === null) {
             return $value;
         }
-        $dateTime = $this->convertModelToIntermediateData($value);
-        $widget   = $this->getOption('widget');
 
-        switch ($widget) {
-            case 'choice':
-                return $this->datetimeToArray($dateTime);
-
-            case 'textfields':
-                return $this->datetimeToArray($dateTime);
-
-            case 'single_textfield':
-                return $dateTime->format($this->getOption('format'));
-
-            default:
-                throw new \UnexpectedValueException("Invalid date widget: {$widget}");
-        }
+        return $this->viewConverter->convert(
+            $this->modelConverter->convertBack($value)
+        );
     }
 
     protected function render(AttributeSet $attributes)
@@ -244,9 +200,9 @@ class Time extends AbstractFormElement
             );
         } else {
             $selected = array(
-                'hour'   => array_search($viewValue['hour'], $this->getOption('hours')),
-                'minute' => array_search($viewValue['minute'], $this->getOption('minutes')),
-                'second' => array_search($viewValue['second'], $this->getOption('seconds'))
+                'hour'   => $viewValue['hour'],
+                'minute' => sprintf('%02s', $viewValue['minute']),
+                'second' => sprintf('%02s', $viewValue['second'])
             );
         }
         $output = '';
@@ -264,10 +220,11 @@ class Time extends AbstractFormElement
             $attr->append('id', '_' . $key);
 
             $options = array();
-            foreach ($this->getOption($key . 's') as $item => $label) {
-                $optionAttrs = array('value' => $item);
+            foreach ($this->getOption($key . 's') as $label) {
+                $label       = sprintf('%02s', $label);
+                $optionAttrs = array('value' => $label);
 
-                if ($selected[$key] === $item) {
+                if ($selected[$key] === $label) {
                     $optionAttrs['selected'] = 'selected';
                 }
                 $options[] = sprintf(
@@ -280,14 +237,5 @@ class Time extends AbstractFormElement
         }
 
         return $output;
-    }
-
-    private function datetimeToArray(\DateTime $dateTime)
-    {
-        return array(
-            'hour'   => $dateTime->format('H'),
-            'minute' => $dateTime->format('i'),
-            'second' => $dateTime->format('s')
-        );
     }
 }

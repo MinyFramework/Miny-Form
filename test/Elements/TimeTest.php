@@ -133,10 +133,11 @@ class TimeTest extends \PHPUnit_Framework_TestCase
         $element->setOption('seconds', array('1', '2', '3'));
         $element->setOption('widget', 'choice');
 
+        $widget = $element->widget();
         $this->assertEquals(
-            '<select name="someProperty[hour]" id="someProperty_hour"><option value="0">10</option><option value="1">11</option></select>' .
-            '<select name="someProperty[minute]" id="someProperty_minute"><option value="0">1</option><option value="1">2</option></select>' .
-            '<select name="someProperty[second]" id="someProperty_second"><option value="0">1</option><option value="1">2</option><option value="2">3</option></select>',
+            '<select name="someProperty[hour]" id="someProperty_hour"><option value="10">10</option><option value="11">11</option></select>' .
+            '<select name="someProperty[minute]" id="someProperty_minute"><option value="01">01</option><option value="02">02</option></select>' .
+            '<select name="someProperty[second]" id="someProperty_second"><option value="01">01</option><option value="02">02</option><option value="03">03</option></select>',
             $element->widget()
         );
 
@@ -144,22 +145,22 @@ class TimeTest extends \PHPUnit_Framework_TestCase
         $this->form->initialize();
 
         $this->assertEquals(
-            '<select name="someProperty[hour]" id="someProperty_hour"><option value="0">10</option><option value="1" selected="selected">11</option></select>' .
-            '<select name="someProperty[minute]" id="someProperty_minute"><option value="0" selected="selected">1</option><option value="1">2</option></select>' .
-            '<select name="someProperty[second]" id="someProperty_second"><option value="0">1</option><option value="1" selected="selected">2</option><option value="2">3</option></select>',
+            '<select name="someProperty[hour]" id="someProperty_hour"><option value="10">10</option><option value="11" selected="selected">11</option></select>' .
+            '<select name="someProperty[minute]" id="someProperty_minute"><option value="01" selected="selected">01</option><option value="02">02</option></select>' .
+            '<select name="someProperty[second]" id="someProperty_second"><option value="01">01</option><option value="02" selected="selected">02</option><option value="03">03</option></select>',
             $element->widget()
         );
 
         $element->setOption('with_seconds', false);
         $this->assertEquals(
-            '<select name="someProperty[hour]" id="someProperty_hour"><option value="0">10</option><option value="1" selected="selected">11</option></select>' .
-            '<select name="someProperty[minute]" id="someProperty_minute"><option value="0" selected="selected">1</option><option value="1">2</option></select>',
+            '<select name="someProperty[hour]" id="someProperty_hour"><option value="10">10</option><option value="11" selected="selected">11</option></select>' .
+            '<select name="someProperty[minute]" id="someProperty_minute"><option value="01" selected="selected">01</option><option value="02">02</option></select>',
             $element->widget()
         );
 
         $element->setOption('with_minutes', false);
         $this->assertEquals(
-            '<select name="someProperty[hour]" id="someProperty_hour"><option value="0">10</option><option value="1" selected="selected">11</option></select>',
+            '<select name="someProperty[hour]" id="someProperty_hour"><option value="10">10</option><option value="11" selected="selected">11</option></select>',
             $element->widget()
         );
     }
@@ -197,9 +198,9 @@ class TimeTest extends \PHPUnit_Framework_TestCase
         $this->form->handle(
             new Request('POST', '?', array(), array(
                     'someProperty' => array(
-                        'hour'   => '1',
-                        'minute' => '2',
-                        'second' => '2'
+                        'hour'   => '11',
+                        'minute' => '02',
+                        'second' => '02'
                     )
                 )
             )
@@ -242,9 +243,9 @@ class TimeTest extends \PHPUnit_Framework_TestCase
         $this->form->handle(
             new Request('POST', '?', array(), array(
                     'someProperty' => array(
-                        'hour'   => '1',
-                        'minute' => '2',
-                        'second' => '2'
+                        'hour'   => '11',
+                        'minute' => '02',
+                        'second' => '02'
                     )
                 )
             )
@@ -285,9 +286,9 @@ class TimeTest extends \PHPUnit_Framework_TestCase
         $this->form->handle(
             new Request('POST', '?', array(), array(
                     'someProperty' => array(
-                        'hour'   => '1',
-                        'minute' => '2',
-                        'second' => '2'
+                        'hour'   => '11',
+                        'minute' => '02',
+                        'second' => '02'
                     )
                 )
             )
@@ -341,9 +342,9 @@ class TimeTest extends \PHPUnit_Framework_TestCase
         $this->form->handle(
             new Request('POST', '?', array(), array(
                     'someProperty' => array(
-                        'hour'   => '1',
-                        'minute' => '2',
-                        'second' => '2'
+                        'hour'   => '11',
+                        'minute' => '02',
+                        'second' => '02'
                     )
                 )
             )

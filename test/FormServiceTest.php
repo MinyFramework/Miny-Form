@@ -25,7 +25,7 @@ class FormServiceTest extends \PHPUnit_Framework_TestCase
     {
         $tokenProvider = new CsrfTokenProvider(new Session(false));
 
-        $this->validator = new ValidatorService(new EventDispatcher());
+        $this->validator   = new ValidatorService(new EventDispatcher());
         $this->formService = new FormService($tokenProvider, $this->validator);
     }
 
@@ -70,17 +70,19 @@ class FormServiceTest extends \PHPUnit_Framework_TestCase
         $object->foo = 'foo';
         $form->handle($request);
         $this->assertFalse($form->isValid());
+        $this->assertTrue($form->get('submit')->clicked());
 
         $object->foo = '';
         $form->handle($request);
         $this->assertTrue($form->isValid());
+        $this->assertTrue($form->get('submit')->clicked());
 
         //'default' scenario: $object->foo is not checked
         $object->foo = 'whatever';
         $form->handle(new Request('POST', '?', array(), array('not_submit' => '')));
 
         $this->assertTrue($form->isValid());
-        $this->assertTrue($form->get('submit')->clicked());
+        $this->assertFalse($form->get('submit')->clicked());
         $this->assertFalse(isset($object->submit));
     }
 

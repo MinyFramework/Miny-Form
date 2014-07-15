@@ -9,11 +9,67 @@
 
 namespace Modules\Form\Elements;
 
+use Modules\Form\AbstractConverter;
 use Modules\Form\AbstractFormElement;
 use Modules\Form\AttributeSet;
+use Modules\Form\Converters\DateTimeToArrayConverter;
+use Modules\Form\Converters\DateTimeToStringConverter;
+use Modules\Form\Converters\DateTimeToTimestampConverter;
+use Modules\Form\Converters\NullConverter;
 
 class Date extends AbstractFormElement
 {
+    /**
+     * @var AbstractConverter
+     */
+    private $viewConverter;
+
+    /**
+     * @var AbstractConverter
+     */
+    private $modelConverter;
+
+    public function initialize()
+    {
+        $this->viewConverter  = $this->createViewConverter();
+        $this->modelConverter = $this->createModelConverter();
+
+        parent::initialize();
+    }
+
+    private function createModelConverter()
+    {
+        $type = $this->getOption('data_type');
+        switch ($type) {
+            case 'datetime':
+                return new NullConverter();
+
+            case 'string':
+                return new DateTimeToStringConverter($this->getOption('format'));
+
+            case 'timestamp':
+                return new DateTimeToTimestampConverter();
+
+            case 'array':
+                return new DateTimeToArrayConverter(array('year', 'month', 'day'));
+        }
+        throw new \UnexpectedValueException("Invalid date type: {$type}");
+    }
+
+    private function createViewConverter()
+    {
+        $widget = $this->getOption('widget');
+        switch ($widget) {
+            case 'choice':
+            case 'textfields':
+                return new DateTimeToArrayConverter(array('year', 'month', 'day'));
+
+            case 'single_textfield':
+                return new DateTimeToStringConverter($this->getOption('format'));
+        }
+        throw new \UnexpectedValueException("Invalid date widget: {$widget}");
+    }
+
     protected function getDefaultOptions()
     {
         $current = new \DateTime('now');
@@ -32,102 +88,15 @@ class Date extends AbstractFormElement
         return array_merge(parent::getDefaultOptions(), $default);
     }
 
-    /**
-     * @param $value
-     *
-     * @throws \UnexpectedValueException
-     * @return \DateTime
-     */
-    private function convertViewToIntermediateData($value)
-    {
-        $widget = $this->getOption('widget');
-
-        switch ($widget) {
-            case 'choice':
-                $years  = $this->getOption('years');
-                $months = $this->getOption('months');
-                $days   = $this->getOption('days');
-
-                $year  = $years[$value['year']];
-                $month = $months[$value['month']];
-                $day   = $days[$value['day']];
-
-                $date = new \DateTime("{$year}-{$month}-{$day}");
-                break;
-
-            case 'textfields':
-                $date = new \DateTime("{$value['year']}-{$value['month']}-{$value['day']}");
-                break;
-
-            case 'single_textfield':
-                $date = \DateTime::createFromFormat($this->getOption('format'), $value);
-                break;
-
-            default:
-                throw new \UnexpectedValueException("Invalid date widget: {$widget}");
-        }
-        $date->setTime(0, 0, 0);
-
-        return $date;
-    }
-
-    /**
-     * @param $value
-     *
-     * @throws \UnexpectedValueException
-     * @return \DateTime
-     */
-    private function convertModelToIntermediateData($value)
-    {
-        $type = $this->getOption('data_type');
-
-        switch ($type) {
-            case 'datetime':
-                return $value;
-
-            case 'string':
-                return \DateTime::createFromFormat($this->getOption('format'), $value);
-
-            case 'timestamp':
-                $date = new \DateTime();
-                $date->setTimestamp($value);
-
-                return $date;
-
-            case 'array':
-                $date = new \DateTime();
-                $date->setDate($value['year'], $value['month'], $value['day']);
-
-                return $date;
-
-            default:
-                throw new \UnexpectedValueException("Invalid date type: {$type}");
-        }
-    }
-
     protected function toModelValue($value)
     {
         if ($value === null) {
             return $value;
         }
-        $dateTime = $this->convertViewToIntermediateData($value);
-        $type     = $this->getOption('data_type');
-        switch ($type) {
-            case 'datetime':
-                return $dateTime;
+        $dateTime = $this->viewConverter->convertBack($value);
+        $dateTime->setTime(0, 0, 0);
 
-            case 'timestamp':
-                return $dateTime->getTimestamp();
-
-            case 'array':
-                return $this->datetimeToArray($dateTime);
-
-            case 'string':
-                return $dateTime->format($this->getOption('format'));
-
-            default:
-                throw new \UnexpectedValueException("Invalid date type: {$type}");
-        }
+        return $this->modelConverter->convert($dateTime);
     }
 
     protected function toViewValue($value)
@@ -135,22 +104,10 @@ class Date extends AbstractFormElement
         if ($value === null) {
             return $value;
         }
-        $dateTime = $this->convertModelToIntermediateData($value);
-        $widget   = $this->getOption('widget');
 
-        switch ($widget) {
-            case 'choice':
-                return $this->datetimeToArray($dateTime);
-
-            case 'textfields':
-                return $this->datetimeToArray($dateTime);
-
-            case 'single_textfield':
-                return $dateTime->format($this->getOption('format'));
-
-            default:
-                throw new \UnexpectedValueException("Invalid date widget: {$widget}");
-        }
+        return $this->viewConverter->convert(
+            $this->modelConverter->convertBack($value)
+        );
     }
 
     protected function render(AttributeSet $attributes)
@@ -237,9 +194,9 @@ class Date extends AbstractFormElement
             );
         } else {
             $selected = array(
-                'year'  => array_search($viewValue['year'], $this->getOption('years')),
-                'month' => array_search($viewValue['month'], $this->getOption('months')),
-                'day'   => array_search($viewValue['day'], $this->getOption('days'))
+                'year'  => $viewValue['year'],
+                'month' => sprintf('%02s', $viewValue['month']),
+                'day'   => sprintf('%02s', $viewValue['day'])
             );
         }
         $output = '';
@@ -250,10 +207,11 @@ class Date extends AbstractFormElement
             $attr->append('id', '_' . $key);
 
             $options = array();
-            foreach ($this->getOption($key . 's') as $item => $label) {
-                $optionAttrs = array('value' => $item);
+            foreach ($this->getOption($key . 's') as $label) {
+                $label       = sprintf('%02s', $label);
+                $optionAttrs = array('value' => $label);
 
-                if ($selected[$key] === $item) {
+                if ($selected[$key] === $label) {
                     $optionAttrs['selected'] = 'selected';
                 }
                 $options[] = sprintf(
@@ -266,14 +224,5 @@ class Date extends AbstractFormElement
         }
 
         return $output;
-    }
-
-    private function datetimeToArray(\DateTime $dateTime)
-    {
-        return array(
-            'year'  => $dateTime->format('Y'),
-            'month' => $dateTime->format('m'),
-            'day'   => $dateTime->format('d')
-        );
     }
 }

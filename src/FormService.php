@@ -31,13 +31,13 @@ class FormService
         'checkbox' => 'Modules\\Form\\Elements\\CheckBox',
         'choice'   => 'Modules\\Form\\Elements\\Choice',
         'date'     => 'Modules\\Form\\Elements\\Date',
-        'hidden' => 'Modules\\Form\\Elements\\Hidden',
+        'hidden'   => 'Modules\\Form\\Elements\\Hidden',
         'password' => 'Modules\\Form\\Elements\\Password',
         'reset'    => 'Modules\\Form\\Elements\\ResetButton',
         'submit'   => 'Modules\\Form\\Elements\\SubmitButton',
         'text'     => 'Modules\\Form\\Elements\\Text',
         'textarea' => 'Modules\\Form\\Elements\\Textarea',
-        'time'   => 'Modules\\Form\\Elements\\Time',
+        'time'     => 'Modules\\Form\\Elements\\Time',
     );
 
     public function __construct(CsrfTokenProvider $tokenProvider, ValidatorService $validator)

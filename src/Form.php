@@ -155,6 +155,7 @@ class Form implements \IteratorAggregate
 
         //fill $this->object
         foreach ($this->fields as $property => $element) {
+            $element->initialize();
             if ($container->has($property)) {
                 $element->setViewValue($container->get($property));
             }
