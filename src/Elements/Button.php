@@ -14,7 +14,7 @@ use Modules\Form\AttributeSet;
 
 class Button extends AbstractFormElement
 {
-    public function label(AttributeSet $attributes = null)
+    public function label($label = null, AttributeSet $attributes = null)
     {
     }
 

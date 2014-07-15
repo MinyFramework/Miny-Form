@@ -121,7 +121,7 @@ abstract class AbstractFormElement
             ->get($this->getOption('name'));
     }
 
-    public function label(AttributeSet $attributes = null)
+    public function label($label = null, AttributeSet $attributes = null)
     {
         if (!$attributes) {
             $attributes = new AttributeSet();
@@ -133,7 +133,9 @@ abstract class AbstractFormElement
         $attributes->add('id', 'label_' . $idAttribute);
         $attributes->add('for', $idAttribute);
 
-        return "<label{$attributes}>{$this->getOption('label')}</label>";
+        $label = $label ? : $this->getOption('label');
+
+        return "<label{$attributes}>{$label}</label>";
     }
 
     public function widget(AttributeSet $attributes = null)
@@ -161,10 +163,8 @@ abstract class AbstractFormElement
     {
         if (!$attributes) {
             $attributes = new AttributeSet();
-        } elseif (($label = $attributes->remove('label')) !== null) {
-            $savedLabel = $this->getOption('label');
-            $this->setOption('label', $label);
         }
+        $label = $attributes->remove('label');
 
         $labelAttributes = $attributes->remove('label_attributes') ? : array();
         $errorAttributes = $attributes->remove('error_attributes') ? : array();
@@ -172,13 +172,9 @@ abstract class AbstractFormElement
             $attributes->remove('row_attributes') ? : array()
         );
 
-        $label  = $this->label(new AttributeSet($labelAttributes));
+        $label  = $this->label($label, new AttributeSet($labelAttributes));
         $error  = $this->error(new AttributeSet($errorAttributes));
         $widget = $this->widget($attributes);
-
-        if (isset($savedLabel)) {
-            $this->setOption('label', $savedLabel);
-        }
 
         return "<div{$rowAttributes}>{$label}{$error}{$widget}</div>";
     }

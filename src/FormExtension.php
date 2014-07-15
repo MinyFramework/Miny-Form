@@ -32,7 +32,7 @@ class FormExtension extends Extension
     public function getFunctions()
     {
         $safe = array('is_safe' => 'html');
-        $ns = '\\' . __NAMESPACE__;
+        $ns   = '\\' . __NAMESPACE__;
 
         return array(
             new TemplateFunction('button', array($this, 'button'), $safe),
@@ -114,9 +114,12 @@ function extension_function_errors(Form $form, array $attributes = array())
     return $output . '</ul>';
 }
 
-function extension_function_label(AbstractFormElement $element, array $attributes = array())
-{
-    return $element->label(new AttributeSet($attributes));
+function extension_function_label(
+    AbstractFormElement $element,
+    $label = null,
+    array $attributes = array()
+) {
+    return $element->label($label, new AttributeSet($attributes));
 }
 
 function extension_function_widget(AbstractFormElement $element, array $attributes = array())
