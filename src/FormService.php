@@ -26,7 +26,7 @@ class FormService
     /**
      * @var string[]
      */
-    private $elements = array(
+    private $elements = [
         'button'   => 'Modules\\Form\\Elements\\Button',
         'checkbox' => 'Modules\\Form\\Elements\\CheckBox',
         'choice'   => 'Modules\\Form\\Elements\\Choice',
@@ -38,7 +38,7 @@ class FormService
         'text'     => 'Modules\\Form\\Elements\\Text',
         'textarea' => 'Modules\\Form\\Elements\\Textarea',
         'time'     => 'Modules\\Form\\Elements\\Time',
-    );
+    ];
 
     public function __construct(CsrfTokenProvider $tokenProvider, ValidatorService $validator)
     {
@@ -59,7 +59,7 @@ class FormService
      * @throws \OutOfBoundsException
      * @return AbstractFormElement
      */
-    public function createElement(Form $form, $name, array $options = array())
+    public function createElement(Form $form, $name, array $options = [])
     {
         if (!isset($this->elements[$name])) {
             throw new \OutOfBoundsException("Element {$name} does not exist.");

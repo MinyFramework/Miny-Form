@@ -51,7 +51,7 @@ class Date extends AbstractFormElement
                 return new DateTimeToTimestampConverter();
 
             case 'array':
-                return new DateTimeToArrayConverter(array('year', 'month', 'day'));
+                return new DateTimeToArrayConverter(['year', 'month', 'day']);
         }
         throw new \UnexpectedValueException("Invalid date type: {$type}");
     }
@@ -62,7 +62,7 @@ class Date extends AbstractFormElement
         switch ($widget) {
             case 'choice':
             case 'textfields':
-                return new DateTimeToArrayConverter(array('year', 'month', 'day'));
+                return new DateTimeToArrayConverter(['year', 'month', 'day']);
 
             case 'single_textfield':
                 return new DateTimeToStringConverter($this->getOption('format'));
@@ -75,15 +75,15 @@ class Date extends AbstractFormElement
         $current = new \DateTime('now');
         $year    = (int)$current->format('Y');
 
-        $default = array(
+        $default = [
             'widget'      => 'choice',
             'format'      => 'Y-m-d',
             'data_type'   => 'datetime',
-            'field_order' => array('year', 'month', 'day'),
+            'field_order' => ['year', 'month', 'day'],
             'years'       => range($year - 5, $year + 5),
             'months'      => range(1, 12),
             'days'        => range(1, 31)
-        );
+        ];
 
         return array_merge(parent::getDefaultOptions(), $default);
     }
@@ -156,11 +156,11 @@ class Date extends AbstractFormElement
     {
         $viewValue = $this->getViewValue();
         if ($viewValue === null) {
-            $viewValue = array(
+            $viewValue = [
                 'year'  => '',
                 'month' => '',
                 'day'   => ''
-            );
+            ];
         }
 
         $output = '';
@@ -187,17 +187,17 @@ class Date extends AbstractFormElement
     {
         $viewValue = $this->getViewValue();
         if ($viewValue === null) {
-            $selected = array(
+            $selected = [
                 'year'  => null,
                 'month' => null,
                 'day'   => null
-            );
+            ];
         } else {
-            $selected = array(
+            $selected = [
                 'year'  => $viewValue['year'],
                 'month' => sprintf('%02s', $viewValue['month']),
                 'day'   => sprintf('%02s', $viewValue['day'])
-            );
+            ];
         }
         $output = '';
         foreach ($this->getOption('field_order') as $key) {
@@ -206,10 +206,10 @@ class Date extends AbstractFormElement
             $attr->append('name', "[{$key}]");
             $attr->append('id', '_' . $key);
 
-            $options = array();
+            $options = [];
             foreach ($this->getOption($key . 's') as $label) {
                 $label       = sprintf('%02s', $label);
-                $optionAttrs = array('value' => $label);
+                $optionAttrs = ['value' => $label];
 
                 if ($selected[$key] === $label) {
                     $optionAttrs['selected'] = 'selected';

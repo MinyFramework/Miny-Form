@@ -16,9 +16,9 @@ class CheckBox extends AbstractFormElement
 {
     protected function getDefaultOptions()
     {
-        $default = array(
+        $default = [
             'empty_data' => false
-        );
+        ];
 
         return array_merge(parent::getDefaultOptions(), $default);
     }

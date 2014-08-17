@@ -34,7 +34,7 @@ class HiddenTest extends \PHPUnit_Framework_TestCase
         $this->validator   = new ValidatorService(new EventDispatcher());
         $this->formService = new FormService($tokenProvider, $this->validator);
 
-        $this->object = (object)array('someProperty' => null);
+        $this->object = (object)['someProperty' => null];
         $this->form   = $this->formService
             ->getFormBuilder($this->object)
             ->add('someProperty', 'hidden')
@@ -44,7 +44,7 @@ class HiddenTest extends \PHPUnit_Framework_TestCase
 
     public function testHiddenField()
     {
-        $request = new Request('POST', '?', array(), array('someProperty' => 'foo'));
+        $request = new Request('POST', '?', [], ['someProperty' => 'foo']);
         $this->assertEquals(
             '<input type="hidden" name="someProperty" id="someProperty" />',
             $this->form->get('someProperty')->widget()

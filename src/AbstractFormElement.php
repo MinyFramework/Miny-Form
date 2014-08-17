@@ -65,7 +65,7 @@ abstract class AbstractFormElement
 
     protected function getDefaultOptions()
     {
-        return array(
+        return [
             'attributes'       => new AttributeSet(),
             'label_attributes' => new AttributeSet(),
             'empty_data'       => null,
@@ -73,7 +73,7 @@ abstract class AbstractFormElement
             'disabled'         => false,
             'label'            => null,
             'data'             => null
-        );
+        ];
     }
 
     public function setViewValue($value)
@@ -166,10 +166,10 @@ abstract class AbstractFormElement
         }
         $label = $attributes->remove('label');
 
-        $labelAttributes = $attributes->remove('label_attributes') ? : array();
-        $errorAttributes = $attributes->remove('error_attributes') ? : array();
+        $labelAttributes = $attributes->remove('label_attributes') ? : [];
+        $errorAttributes = $attributes->remove('error_attributes') ? : [];
         $rowAttributes   = AttributeSet::getAttributeString(
-            $attributes->remove('row_attributes') ? : array()
+            $attributes->remove('row_attributes') ? : []
         );
 
         $label  = $this->label($label, new AttributeSet($labelAttributes));
@@ -189,10 +189,13 @@ abstract class AbstractFormElement
             $attributes = new AttributeSet();
         }
 
-        $output = "<ul{$attributes}>";
-        foreach ($this->getErrors() as $error) {
-            $output .= "<li>{$error}</li>";
-        }
+        $output = array_reduce(
+            $this->getErrors(),
+            function ($output, $error) {
+                return "{$output}<li>{$error}</li>";
+            },
+            "<ul{$attributes}>"
+        );
 
         return $output . '</ul>';
     }

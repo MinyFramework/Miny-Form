@@ -31,17 +31,17 @@ class Time extends AbstractFormElement
 
     protected function getDefaultOptions()
     {
-        $default = array(
+        $default = [
             'widget'       => 'choice',
             'format'       => 'H:i:s',
             'data_type'    => 'datetime',
             'with_minutes' => true,
             'with_seconds' => true,
-            'field_order'  => array('hour', 'minute', 'second'),
+            'field_order'  => ['hour', 'minute', 'second'],
             'hours'        => range(0, 23),
             'minutes'      => range(0, 59),
             'seconds'      => range(0, 59)
-        );
+        ];
 
         return array_merge(parent::getDefaultOptions(), $default);
     }
@@ -68,7 +68,7 @@ class Time extends AbstractFormElement
                 return new DateTimeToTimestampConverter();
 
             case 'array':
-                return new DateTimeToArrayConverter(array('hour', 'minute', 'second'));
+                return new DateTimeToArrayConverter(['hour', 'minute', 'second']);
         }
         throw new \UnexpectedValueException("Invalid date type: {$type}");
     }
@@ -79,7 +79,7 @@ class Time extends AbstractFormElement
         switch ($widget) {
             case 'choice':
             case 'textfields':
-                return new DateTimeToArrayConverter(array('hour', 'minute', 'second'));
+                return new DateTimeToArrayConverter(['hour', 'minute', 'second']);
 
             case 'single_textfield':
                 return new DateTimeToStringConverter($this->getOption('format'));
@@ -155,11 +155,11 @@ class Time extends AbstractFormElement
     {
         $viewValue = $this->getViewValue();
         if ($viewValue === null) {
-            $viewValue = array(
+            $viewValue = [
                 'hour'   => '',
                 'minute' => '',
                 'second' => ''
-            );
+            ];
         }
 
         $output = '';
@@ -193,17 +193,17 @@ class Time extends AbstractFormElement
     {
         $viewValue = $this->getViewValue();
         if ($viewValue === null) {
-            $selected = array(
+            $selected = [
                 'hour'   => null,
                 'minute' => null,
                 'second' => null
-            );
+            ];
         } else {
-            $selected = array(
+            $selected = [
                 'hour'   => $viewValue['hour'],
                 'minute' => sprintf('%02s', $viewValue['minute']),
                 'second' => sprintf('%02s', $viewValue['second'])
-            );
+            ];
         }
         $output = '';
         $fields = $this->getOption('field_order');
@@ -219,10 +219,10 @@ class Time extends AbstractFormElement
             $attr->append('name', "[{$key}]");
             $attr->append('id', '_' . $key);
 
-            $options = array();
+            $options = [];
             foreach ($this->getOption($key . 's') as $label) {
                 $label       = sprintf('%02s', $label);
-                $optionAttrs = array('value' => $label);
+                $optionAttrs = ['value' => $label];
 
                 if ($selected[$key] === $label) {
                     $optionAttrs['selected'] = 'selected';

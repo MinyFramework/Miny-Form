@@ -43,7 +43,7 @@ class FormBuilder
         return $this;
     }
 
-    public function add($property, $type, array $options = array())
+    public function add($property, $type, array $options = [])
     {
         $element = $this->formService->createElement($this->form, $type, $options);
 

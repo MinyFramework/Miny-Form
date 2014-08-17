@@ -31,10 +31,10 @@ class CheckBoxTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $tokenProvider     = new CsrfTokenProvider(new Session(false));
-        $this->validator = new ValidatorService(new EventDispatcher());
+        $this->validator   = new ValidatorService(new EventDispatcher());
         $this->formService = new FormService($tokenProvider, $this->validator);
 
-        $this->object = (object)array('someProperty' => null);
+        $this->object = (object)['someProperty' => null];
         $this->form   = $this->formService
             ->getFormBuilder($this->object)
             ->add('someProperty', 'checkbox')
@@ -44,7 +44,7 @@ class CheckBoxTest extends \PHPUnit_Framework_TestCase
 
     public function testCheckBox()
     {
-        $request = new Request('POST', '?', array(), array());
+        $request = new Request('POST', '?', [], []);
         $this->form->handle($request);
         $this->assertFalse($this->object->someProperty);
 
@@ -54,7 +54,7 @@ class CheckBoxTest extends \PHPUnit_Framework_TestCase
             $widget
         );
 
-        $request = new Request('POST', '?', array(), array('someProperty' => 'on'));
+        $request = new Request('POST', '?', [], ['someProperty' => 'on']);
         $this->form->handle($request);
         $this->assertTrue($this->object->someProperty);
 

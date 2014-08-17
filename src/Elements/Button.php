@@ -20,10 +20,6 @@ class Button extends AbstractFormElement
 
     protected function render(AttributeSet $attributes)
     {
-        return sprintf(
-            '<button%s>%s</button>',
-            $attributes,
-            $this->getOption('label')
-        );
+        return "<button{$attributes}>{$this->getOption('label')}</button>";
     }
 }

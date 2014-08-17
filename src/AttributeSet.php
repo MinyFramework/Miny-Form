@@ -33,7 +33,7 @@ class AttributeSet
 
     private $attributes;
 
-    public function __construct(array $attributes = array())
+    public function __construct(array $attributes = [])
     {
         $this->attributes = $attributes;
     }

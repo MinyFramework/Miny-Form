@@ -40,7 +40,7 @@ class Form implements \IteratorAggregate
     /**
      * @var AbstractFormElement[]
      */
-    private $fields = array();
+    private $fields = [];
 
     /**
      * @var string
@@ -50,9 +50,9 @@ class Form implements \IteratorAggregate
     /**
      * @var array
      */
-    private $options = array();
+    private $options = [];
     private $currentValidationScenario;
-    private $notRenderedFields = array();
+    private $notRenderedFields = [];
     private $onFailureCallback;
     private $onSuccessCallback;
 
@@ -93,13 +93,13 @@ class Form implements \IteratorAggregate
 
     private function getDefaultOptionsArray()
     {
-        return array(
+        return [
             'action'          => '?',
             'method'          => 'POST',
             'csrf_protection' => true,
             'csrf_field'      => '_token',
             'validate_for'    => null
-        );
+        ];
     }
 
     public function hasOption($key, $scenario = null)
@@ -175,10 +175,9 @@ class Form implements \IteratorAggregate
         //null if not set by user - use configuration
         if ($this->currentValidationScenario === null) {
             if ($this->hasOption('validate_for', $scenario)) {
-                $this->currentValidationScenario = $this->getOption('validate_for', $scenario);
-            } else {
-                $this->currentValidationScenario = $scenario;
+                $scenario = $this->getOption('validate_for', $scenario);
             }
+            $this->currentValidationScenario = $scenario;
         }
 
         //false if validation is disabled
@@ -230,7 +229,7 @@ class Form implements \IteratorAggregate
             return $this->data->$property;
         } else {
             $name = ucfirst($property);
-            foreach (array('get', 'has', 'is') as $prefix) {
+            foreach (['get', 'has', 'is'] as $prefix) {
                 $getter = $prefix . $name;
                 if (method_exists($this->data, $getter)) {
                     return $this->data->$getter();
@@ -321,7 +320,7 @@ class Form implements \IteratorAggregate
         return new \ArrayIterator($this->fields);
     }
 
-    public function begin(array $attributes = array(), $scenario = null)
+    public function begin(array $attributes = [], $scenario = null)
     {
         if ($scenario !== null) {
             $this->currentScenario = $scenario;
@@ -334,7 +333,8 @@ class Form implements \IteratorAggregate
         $this->addMethodEmulationField($method);
         $this->addCsrfTokenField();
 
-        $this->notRenderedFields = array_flip(array_keys($this->fields));
+        $keys                    = array_keys($this->fields);
+        $this->notRenderedFields = array_combine($keys, $keys);
 
         return $output;
     }
@@ -355,7 +355,7 @@ class Form implements \IteratorAggregate
     private function addCsrfTokenField()
     {
         if ($this->getOption('csrf_protection', $this->currentScenario)) {
-            $csrfField = new Hidden($this, array());
+            $csrfField = new Hidden($this, []);
 
             $this->add($this->getOption('csrf_field'), $csrfField);
             $csrfField->initialize();
@@ -366,7 +366,7 @@ class Form implements \IteratorAggregate
     private function addMethodEmulationField($method)
     {
         if ($method !== 'GET' && $method !== 'POST') {
-            $methodField = new Hidden($this, array());
+            $methodField = new Hidden($this, []);
 
             $this->add('_method', $methodField);
             $methodField->initialize();
@@ -381,12 +381,13 @@ class Form implements \IteratorAggregate
 
     public function end()
     {
-        $output = '';
-        foreach ($this->notRenderedFields as $field => $key) {
-            $output .= $this->get($field)->row();
-        }
-
-        return $output . '</form>';
+        return array_reduce(
+            $this->notRenderedFields,
+            function ($output, $field) {
+                return $this->get($field)->row() . $output;
+            },
+            '</form>'
+        );
     }
 
     public function markRendered($field)
@@ -394,33 +395,29 @@ class Form implements \IteratorAggregate
         unset($this->notRenderedFields[$field]);
     }
 
-    public function onSuccess($callback)
+    public function onSuccess(callable $callback)
     {
-        if (!is_callable($callback)) {
-            throw new \InvalidArgumentException('$callback needs to be callable');
-        }
         $this->onSuccessCallback = $callback;
     }
 
-    public function onFailure($callback)
+    public function onFailure(callable $callback)
     {
-        if (!is_callable($callback)) {
-            throw new \InvalidArgumentException('$callback needs to be callable');
-        }
         $this->onFailureCallback = $callback;
     }
 
     private function success()
     {
         if (isset($this->onSuccessCallback)) {
-            call_user_func($this->onSuccessCallback, $this);
+            $callback = $this->onSuccessCallback;
+            $callback($this);
         }
     }
 
     private function failure()
     {
         if (isset($this->onFailureCallback)) {
-            call_user_func($this->onFailureCallback, $this);
+            $callback = $this->onFailureCallback;
+            $callback($this);
         }
     }
 }

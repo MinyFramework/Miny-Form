@@ -31,10 +31,10 @@ class PasswordTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $tokenProvider     = new CsrfTokenProvider(new Session(false));
-        $this->validator = new ValidatorService(new EventDispatcher());
+        $this->validator   = new ValidatorService(new EventDispatcher());
         $this->formService = new FormService($tokenProvider, $this->validator);
 
-        $this->object = (object)array('someProperty' => null);
+        $this->object = (object)['someProperty' => null];
         $this->form   = $this->formService
             ->getFormBuilder($this->object)
             ->add('someProperty', 'password')
@@ -44,7 +44,7 @@ class PasswordTest extends \PHPUnit_Framework_TestCase
 
     public function testPasswordField()
     {
-        $request = new Request('POST', '?', array(), array('someProperty' => 'foo'));
+        $request = new Request('POST', '?', [], ['someProperty' => 'foo']);
         $this->assertEquals(
             '<input type="password" name="someProperty" id="someProperty" />',
             $this->form->get('someProperty')->widget()

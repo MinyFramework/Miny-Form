@@ -34,7 +34,7 @@ class TimeTest extends \PHPUnit_Framework_TestCase
         $this->validator   = new ValidatorService(new EventDispatcher());
         $this->formService = new FormService($tokenProvider, $this->validator);
 
-        $this->object = (object)array('someProperty' => null);
+        $this->object = (object)['someProperty' => null];
         $this->form   = $this->formService
             ->getFormBuilder($this->object)
             ->add('someProperty', 'time')
@@ -128,12 +128,11 @@ class TimeTest extends \PHPUnit_Framework_TestCase
     {
         $element = $this->form->get('someProperty');
         $element->setOption('data_type', 'string');
-        $element->setOption('hours', array('10', '11'));
-        $element->setOption('minutes', array('1', '2'));
-        $element->setOption('seconds', array('1', '2', '3'));
+        $element->setOption('hours', ['10', '11']);
+        $element->setOption('minutes', ['1', '2']);
+        $element->setOption('seconds', ['1', '2', '3']);
         $element->setOption('widget', 'choice');
 
-        $widget = $element->widget();
         $this->assertEquals(
             '<select name="someProperty[hour]" id="someProperty_hour"><option value="10">10</option><option value="11">11</option></select>' .
             '<select name="someProperty[minute]" id="someProperty_minute"><option value="01">01</option><option value="02">02</option></select>' .
@@ -171,7 +170,7 @@ class TimeTest extends \PHPUnit_Framework_TestCase
 
         $this->form->get('someProperty')->setOption('widget', 'single_textfield');
         $this->form->handle(
-            new Request('POST', '?', array(), array('someProperty' => '10:05:06'))
+            new Request('POST', '?', [], ['someProperty' => '10:05:06'])
         );
 
         $this->assertInstanceOf('\DateTime', $this->object->someProperty);
@@ -179,13 +178,13 @@ class TimeTest extends \PHPUnit_Framework_TestCase
 
         $this->form->get('someProperty')->setOption('widget', 'textfields');
         $this->form->handle(
-            new Request('POST', '?', array(), array(
-                    'someProperty' => array(
+            new Request('POST', '?', [], [
+                    'someProperty' => [
                         'hour'   => '10',
                         'minute' => '05',
                         'second' => '07'
-                    )
-                )
+                    ]
+                ]
             )
         );
 
@@ -193,16 +192,16 @@ class TimeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('10:05:07', $this->object->someProperty->format('H:i:s'));
 
         //choice sends indexes
-        $this->form->get('someProperty')->setOption('hours', array('10', '11'));
+        $this->form->get('someProperty')->setOption('hours', ['10', '11']);
         $this->form->get('someProperty')->setOption('widget', 'choice');
         $this->form->handle(
-            new Request('POST', '?', array(), array(
-                    'someProperty' => array(
+            new Request('POST', '?', [], [
+                    'someProperty' => [
                         'hour'   => '11',
                         'minute' => '02',
                         'second' => '02'
-                    )
-                )
+                    ]
+                ]
             )
         );
 
@@ -216,7 +215,7 @@ class TimeTest extends \PHPUnit_Framework_TestCase
 
         $this->form->get('someProperty')->setOption('widget', 'single_textfield');
         $this->form->handle(
-            new Request('POST', '?', array(), array('someProperty' => '10:05:06'))
+            new Request('POST', '?', [], ['someProperty' => '10:05:06'])
         );
 
         $dateTime = \DateTime::createFromFormat('H:i:s', '10:05:06');
@@ -224,13 +223,13 @@ class TimeTest extends \PHPUnit_Framework_TestCase
 
         $this->form->get('someProperty')->setOption('widget', 'textfields');
         $this->form->handle(
-            new Request('POST', '?', array(), array(
-                    'someProperty' => array(
+            new Request('POST', '?', [], [
+                    'someProperty' => [
                         'hour'   => '10',
                         'minute' => '05',
                         'second' => '07'
-                    )
-                )
+                    ]
+                ]
             )
         );
 
@@ -238,16 +237,16 @@ class TimeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($dateTime->format('U'), $this->object->someProperty);
 
         //choice sends indexes
-        $this->form->get('someProperty')->setOption('hours', array('10', '11'));
+        $this->form->get('someProperty')->setOption('hours', ['10', '11']);
         $this->form->get('someProperty')->setOption('widget', 'choice');
         $this->form->handle(
-            new Request('POST', '?', array(), array(
-                    'someProperty' => array(
+            new Request('POST', '?', [], [
+                    'someProperty' => [
                         'hour'   => '11',
                         'minute' => '02',
                         'second' => '02'
-                    )
-                )
+                    ]
+                ]
             )
         );
 
@@ -261,36 +260,36 @@ class TimeTest extends \PHPUnit_Framework_TestCase
 
         $this->form->get('someProperty')->setOption('widget', 'single_textfield');
         $this->form->handle(
-            new Request('POST', '?', array(), array('someProperty' => '10:05:06'))
+            new Request('POST', '?', [], ['someProperty' => '10:05:06'])
         );
 
         $this->assertEquals('10:05:06', $this->object->someProperty);
 
         $this->form->get('someProperty')->setOption('widget', 'textfields');
         $this->form->handle(
-            new Request('POST', '?', array(), array(
-                    'someProperty' => array(
+            new Request('POST', '?', [], [
+                    'someProperty' => [
                         'hour'   => '10',
                         'minute' => '05',
                         'second' => '07'
-                    )
-                )
+                    ]
+                ]
             )
         );
 
         $this->assertEquals('10:05:07', $this->object->someProperty);
 
         //choice sends indexes
-        $this->form->get('someProperty')->setOption('hours', array('10', '11'));
+        $this->form->get('someProperty')->setOption('hours', ['10', '11']);
         $this->form->get('someProperty')->setOption('widget', 'choice');
         $this->form->handle(
-            new Request('POST', '?', array(), array(
-                    'someProperty' => array(
+            new Request('POST', '?', [], [
+                    'someProperty' => [
                         'hour'   => '11',
                         'minute' => '02',
                         'second' => '02'
-                    )
-                )
+                    ]
+                ]
             )
         );
 
@@ -303,59 +302,59 @@ class TimeTest extends \PHPUnit_Framework_TestCase
 
         $this->form->get('someProperty')->setOption('widget', 'single_textfield');
         $this->form->handle(
-            new Request('POST', '?', array(), array('someProperty' => '10:05:06'))
+            new Request('POST', '?', [], ['someProperty' => '10:05:06'])
         );
 
         $this->assertEquals(
-            array(
+            [
                 'hour'   => '10',
                 'minute' => '05',
                 'second' => '06'
-            ),
+            ],
             $this->object->someProperty
         );
 
         $this->form->get('someProperty')->setOption('widget', 'textfields');
         $this->form->handle(
-            new Request('POST', '?', array(), array(
-                    'someProperty' => array(
+            new Request('POST', '?', [], [
+                    'someProperty' => [
                         'hour'   => '10',
                         'minute' => '05',
                         'second' => '07'
-                    )
-                )
+                    ]
+                ]
             )
         );
 
         $this->assertEquals(
-            array(
+            [
                 'hour'   => '10',
                 'minute' => '05',
                 'second' => '07'
-            ),
+            ],
             $this->object->someProperty
         );
 
         //choice sends indexes
-        $this->form->get('someProperty')->setOption('hours', array('10', '11'));
+        $this->form->get('someProperty')->setOption('hours', ['10', '11']);
         $this->form->get('someProperty')->setOption('widget', 'choice');
         $this->form->handle(
-            new Request('POST', '?', array(), array(
-                    'someProperty' => array(
+            new Request('POST', '?', [], [
+                    'someProperty' => [
                         'hour'   => '11',
                         'minute' => '02',
                         'second' => '02'
-                    )
-                )
+                    ]
+                ]
             )
         );
 
         $this->assertEquals(
-            array(
+            [
                 'hour'   => '11',
                 'minute' => '02',
                 'second' => '02'
-            ),
+            ],
             $this->object->someProperty
         );
     }

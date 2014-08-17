@@ -18,12 +18,12 @@ class Module extends \Miny\Modules\Module
 
     public function getDependencies()
     {
-        return array('Validator');
+        return ['Validator'];
     }
 
     public function init(BaseApplication $app)
     {
-        $container  = $app->getContainer();
+        $container = $app->getContainer();
 
         $this->ifModule(
             'Templating',

@@ -45,7 +45,7 @@ class FormServiceTest extends \PHPUnit_Framework_TestCase
             ->getForm();
         $form->setOption('csrf_protection', false);
 
-        $form->handle(new Request('POST', '?', array(), array('submit' => '')));
+        $form->handle(new Request('POST', '?', [], ['submit' => '']));
 
         $this->assertTrue($form->get('submit')->clicked());
         $this->assertFalse(isset($object->submit));
@@ -54,18 +54,18 @@ class FormServiceTest extends \PHPUnit_Framework_TestCase
     public function testSubmitButtonCanChangeScenario()
     {
         $ruleSet = new RuleSet();
-        $ruleSet->property('foo', Blank::fromArray(array('for' => 'test')));
+        $ruleSet->property('foo', Blank::fromArray(['for' => 'test']));
         $this->validator->register('stdClass', $ruleSet);
 
         $object = new \stdClass();
 
         //'test' scenario: $object->foo should be Blank
         $form = $this->formService->getFormBuilder($object)
-            ->add('submit', 'submit', array('validate_for' => 'test'))
+            ->add('submit', 'submit', ['validate_for' => 'test'])
             ->getForm();
         $form->setOption('csrf_protection', false);
 
-        $request = new Request('POST', '?', array(), array('submit' => ''));
+        $request = new Request('POST', '?', [], ['submit' => '']);
 
         $object->foo = 'foo';
         $form->handle($request);
@@ -79,7 +79,7 @@ class FormServiceTest extends \PHPUnit_Framework_TestCase
 
         //'default' scenario: $object->foo is not checked
         $object->foo = 'whatever';
-        $form->handle(new Request('POST', '?', array(), array('not_submit' => '')));
+        $form->handle(new Request('POST', '?', [], ['not_submit' => '']));
 
         $this->assertTrue($form->isValid());
         $this->assertFalse($form->get('submit')->clicked());
@@ -88,7 +88,7 @@ class FormServiceTest extends \PHPUnit_Framework_TestCase
 
     public function testSubmitButtonNotClicked()
     {
-        $request = new Request('POST', '?', array(), array('not_submit' => ''));
+        $request = new Request('POST', '?', [], ['not_submit' => '']);
 
         $object = new \stdClass();
         $form   = $this->formService->getFormBuilder($object)

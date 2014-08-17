@@ -18,14 +18,14 @@ class Choice extends AbstractFormElement
 
     protected function getDefaultOptions()
     {
-        $default = array(
+        $default = [
             'choices'   => null,
             'source'    => null,
             'multiple'  => false,
             'expanded'  => false,
             'preferred' => null,
             'separator' => '--------'
-        );
+        ];
 
         return array_merge(parent::getDefaultOptions(), $default);
     }
@@ -70,7 +70,7 @@ class Choice extends AbstractFormElement
             $this->setOption('choices', $choices);
         }
         if ($this->getOption('multiple')) {
-            $this->setOption('empty_data', array());
+            $this->setOption('empty_data', []);
             $this->checkedCallback = function ($needle, $haystack) {
                 return in_array($needle, $haystack);
             };
@@ -110,7 +110,7 @@ class Choice extends AbstractFormElement
 
     private function renderSelect($multiple, AttributeSet $attributes)
     {
-        $options = array();
+        $options = [];
         $values  = $this->getViewValue();
 
         $choices   = $this->getOption('choices');
@@ -147,7 +147,7 @@ class Choice extends AbstractFormElement
 
     private function getSelectItem($key, $label, $selected)
     {
-        $optionAttributes = array('value' => $key);
+        $optionAttributes = ['value' => $key];
 
         if ($selected) {
             $optionAttributes['selected'] = 'selected';
@@ -165,7 +165,7 @@ class Choice extends AbstractFormElement
         if ($attributes->has('option_attributes')) {
             $itemAttributes = (array)$attributes->get('option_attributes');
         } else {
-            $itemAttributes = array();
+            $itemAttributes = [];
         }
         $itemAttributes['type'] = $multiple ? 'checkbox' : 'radio';
         $itemAttributes['id']   = $itemAttributes['name'] = $this->getOption('name');
@@ -178,7 +178,7 @@ class Choice extends AbstractFormElement
 
     private function renderInputList(AttributeSet $itemAttributes)
     {
-        $options  = array();
+        $options  = [];
         $values   = $this->getViewValue();
         $callback = $this->checkedCallback;
 

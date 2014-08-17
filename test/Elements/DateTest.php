@@ -34,7 +34,7 @@ class DateTest extends \PHPUnit_Framework_TestCase
         $this->validator   = new ValidatorService(new EventDispatcher());
         $this->formService = new FormService($tokenProvider, $this->validator);
 
-        $this->object = (object)array('someProperty' => null);
+        $this->object = (object)['someProperty' => null];
         $this->form   = $this->formService
             ->getFormBuilder($this->object)
             ->add('someProperty', 'date')
@@ -116,9 +116,9 @@ class DateTest extends \PHPUnit_Framework_TestCase
     {
         $element = $this->form->get('someProperty');
         $element->setOption('data_type', 'string');
-        $element->setOption('years', array('2010', '2011'));
-        $element->setOption('months', array('1', '2'));
-        $element->setOption('days', array('1', '2', '3'));
+        $element->setOption('years', ['2010', '2011']);
+        $element->setOption('months', ['1', '2']);
+        $element->setOption('days', ['1', '2', '3']);
         $element->setOption('widget', 'choice');
 
         $this->assertEquals(
@@ -130,7 +130,6 @@ class DateTest extends \PHPUnit_Framework_TestCase
 
         $this->object->someProperty = '2011-01-02';
         $this->form->initialize();
-        $widget = $element->widget();
         $this->assertEquals(
             '<select name="someProperty[year]" id="someProperty_year"><option value="2010">2010</option><option value="2011" selected="selected">2011</option></select>' .
             '<select name="someProperty[month]" id="someProperty_month"><option value="01" selected="selected">01</option><option value="02">02</option></select>' .
@@ -147,7 +146,7 @@ class DateTest extends \PHPUnit_Framework_TestCase
         $field->setOption('widget', 'single_textfield');
 
         $this->form->handle(
-            new Request('POST', '?', array(), array('someProperty' => '2010-05-06'))
+            new Request('POST', '?', [], ['someProperty' => '2010-05-06'])
         );
 
         $this->assertInstanceOf('\DateTime', $this->object->someProperty);
@@ -155,13 +154,13 @@ class DateTest extends \PHPUnit_Framework_TestCase
 
         $field->setOption('widget', 'textfields');
         $this->form->handle(
-            new Request('POST', '?', array(), array(
-                    'someProperty' => array(
+            new Request('POST', '?', [], [
+                    'someProperty' => [
                         'year'  => '2010',
                         'month' => '05',
                         'day'   => '07'
-                    )
-                )
+                    ]
+                ]
             )
         );
 
@@ -169,17 +168,17 @@ class DateTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('2010-05-07', $this->object->someProperty->format('Y-m-d'));
 
         //choice sends indexes
-        $field->setOption('years', array('2010', '2011'));
+        $field->setOption('years', ['2010', '2011']);
         $field->setOption('widget', 'choice');
 
         $this->form->handle(
-            new Request('POST', '?', array(), array(
-                    'someProperty' => array(
+            new Request('POST', '?', [], [
+                    'someProperty' => [
                         'year'  => '2011',
                         'month' => '03',
                         'day'   => '03'
-                    )
-                )
+                    ]
+                ]
             )
         );
 
@@ -193,7 +192,7 @@ class DateTest extends \PHPUnit_Framework_TestCase
 
         $this->form->get('someProperty')->setOption('widget', 'single_textfield');
         $this->form->handle(
-            new Request('POST', '?', array(), array('someProperty' => '2010-05-06'))
+            new Request('POST', '?', [], ['someProperty' => '2010-05-06'])
         );
 
         $dateTime = \DateTime::createFromFormat('Y-m-d H:i:s', '2010-05-06 00:00:00');
@@ -201,13 +200,13 @@ class DateTest extends \PHPUnit_Framework_TestCase
 
         $this->form->get('someProperty')->setOption('widget', 'textfields');
         $this->form->handle(
-            new Request('POST', '?', array(), array(
-                    'someProperty' => array(
+            new Request('POST', '?', [], [
+                    'someProperty' => [
                         'year'  => '2010',
                         'month' => '05',
                         'day'   => '07'
-                    )
-                )
+                    ]
+                ]
             )
         );
 
@@ -215,16 +214,16 @@ class DateTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($dateTime->format('U'), $this->object->someProperty);
 
         //choice sends indexes
-        $this->form->get('someProperty')->setOption('years', array('2010', '2011'));
+        $this->form->get('someProperty')->setOption('years', ['2010', '2011']);
         $this->form->get('someProperty')->setOption('widget', 'choice');
         $this->form->handle(
-            new Request('POST', '?', array(), array(
-                    'someProperty' => array(
+            new Request('POST', '?', [], [
+                    'someProperty' => [
                         'year'  => '2011',
                         'month' => '03',
                         'day'   => '03'
-                    )
-                )
+                    ]
+                ]
             )
         );
 
@@ -238,36 +237,36 @@ class DateTest extends \PHPUnit_Framework_TestCase
 
         $this->form->get('someProperty')->setOption('widget', 'single_textfield');
         $this->form->handle(
-            new Request('POST', '?', array(), array('someProperty' => '2010-05-06'))
+            new Request('POST', '?', [], ['someProperty' => '2010-05-06'])
         );
 
         $this->assertEquals('2010-05-06', $this->object->someProperty);
 
         $this->form->get('someProperty')->setOption('widget', 'textfields');
         $this->form->handle(
-            new Request('POST', '?', array(), array(
-                    'someProperty' => array(
+            new Request('POST', '?', [], [
+                    'someProperty' => [
                         'year'  => '2010',
                         'month' => '05',
                         'day'   => '07'
-                    )
-                )
+                    ]
+                ]
             )
         );
 
         $this->assertEquals('2010-05-07', $this->object->someProperty);
 
         //choice sends indexes
-        $this->form->get('someProperty')->setOption('years', array('2010', '2011'));
+        $this->form->get('someProperty')->setOption('years', ['2010', '2011']);
         $this->form->get('someProperty')->setOption('widget', 'choice');
         $this->form->handle(
-            new Request('POST', '?', array(), array(
-                    'someProperty' => array(
+            new Request('POST', '?', [], [
+                    'someProperty' => [
                         'year'  => '2011',
                         'month' => '03',
                         'day'   => '03'
-                    )
-                )
+                    ]
+                ]
             )
         );
 
@@ -280,59 +279,59 @@ class DateTest extends \PHPUnit_Framework_TestCase
 
         $this->form->get('someProperty')->setOption('widget', 'single_textfield');
         $this->form->handle(
-            new Request('POST', '?', array(), array('someProperty' => '2010-05-06'))
+            new Request('POST', '?', [], ['someProperty' => '2010-05-06'])
         );
 
         $this->assertEquals(
-            array(
+            [
                 'year'  => '2010',
                 'month' => '05',
                 'day'   => '06'
-            ),
+            ],
             $this->object->someProperty
         );
 
         $this->form->get('someProperty')->setOption('widget', 'textfields');
         $this->form->handle(
-            new Request('POST', '?', array(), array(
-                    'someProperty' => array(
+            new Request('POST', '?', [], [
+                    'someProperty' => [
                         'year'  => '2010',
                         'month' => '05',
                         'day'   => '07'
-                    )
-                )
+                    ]
+                ]
             )
         );
 
         $this->assertEquals(
-            array(
+            [
                 'year'  => '2010',
                 'month' => '05',
                 'day'   => '07'
-            ),
+            ],
             $this->object->someProperty
         );
 
         //choice sends indexes
-        $this->form->get('someProperty')->setOption('years', array('2010', '2011'));
+        $this->form->get('someProperty')->setOption('years', ['2010', '2011']);
         $this->form->get('someProperty')->setOption('widget', 'choice');
         $this->form->handle(
-            new Request('POST', '?', array(), array(
-                    'someProperty' => array(
+            new Request('POST', '?', [], [
+                    'someProperty' => [
                         'year'  => '2011',
                         'month' => '03',
                         'day'   => '03'
-                    )
-                )
+                    ]
+                ]
             )
         );
 
         $this->assertEquals(
-            array(
+            [
                 'year'  => '2011',
                 'month' => '03',
                 'day'   => '03'
-            ),
+            ],
             $this->object->someProperty
         );
     }

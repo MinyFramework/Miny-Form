@@ -14,14 +14,14 @@ use Modules\Form\AbstractConverter;
 class DateTimeToArrayConverter extends AbstractConverter
 {
     private $keys;
-    private static $formats = array(
+    private static $formats = [
         'year'   => 'Y',
         'month'  => 'm',
         'day'    => 'd',
         'hour'   => 'H',
         'minute' => 'i',
         'second' => 's',
-    );
+    ];
 
     public function __construct(array $keys)
     {
@@ -34,7 +34,7 @@ class DateTimeToArrayConverter extends AbstractConverter
             throw new \InvalidArgumentException('A DateTime object is expected');
         }
 
-        $return = array();
+        $return = [];
         foreach ($this->keys as $key) {
             $return[$key] = $value->format(self::$formats[$key]);
         }
